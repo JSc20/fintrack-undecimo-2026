@@ -13,5 +13,6 @@ namespace FinTrack_II_Trimestre.Data
         public DbSet<Income> Incomes { get; set; }
         public DbSet<Expense> Expenses { get; set; }
 		public DbSet<SavingsGoal> SavingsGoals { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
 	}
 }
