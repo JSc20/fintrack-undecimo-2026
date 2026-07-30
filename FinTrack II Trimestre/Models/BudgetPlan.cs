@@ -8,9 +8,13 @@ namespace FinTrack_II_Trimestre.Models
         [Key]
         public int PlanId { get; set; }
 
-        //Poner en función la relación con la tabla User, pero por ahora se deja comentada.
-        // [ForeignKey(nameof(UserId))]
-        // public virtual User? User { get; set; }
+        [Required]
+        public int UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public virtual User? User { get; set; }
+
+        public ICollection<PlanDetail> PlanDetails { get; set; } = new List<PlanDetail>();
 
         [Required(ErrorMessage = "Seleccionar un tipo de plan es obligatorio.")]
         [StringLength(50, MinimumLength = 2, ErrorMessage = "El tipo de plan debe tener entre 2 y 50 caracteres.")]

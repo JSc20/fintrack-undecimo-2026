@@ -1,0 +1,67 @@
+@model IEnumerable<BudgetPlan>
+
+@{
+    ViewData["Title"] = "Planes de Ahorro";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Planes de Ahorro</h1>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Plan</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No tienes planes de ahorro registrados.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Tipo de Plan</th>
+                <th>Fecha de Creación</th>
+                <th>Estado</th>
+                <th>Categorías</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plan in Model)
+            {
+                <tr>
+                    <td>@plan.PlanType</td>
+                    <td>@plan.CreationDate.ToShortDateString()</td>
+                    <td>
+                        @if (plan.Status)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </td>
+                    <td>@plan.PlanDetails.Count</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@plan.PlanId" class="btn btn-sm btn-info">Detalles</a>
+                        @if (plan.Status)
+                        {
+                            <form asp-action="Deactivate" asp-route-id="@plan.PlanId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-warning">Desactivar</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Activate" asp-route-id="@plan.PlanId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success">Activar</button>
+                            </form>
+                        }
+                        <form asp-action="Delete" asp-route-id="@plan.PlanId" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar este plan?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

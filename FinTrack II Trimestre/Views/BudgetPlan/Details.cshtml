@@ -1,0 +1,55 @@
+@model BudgetPlan
+
+@{
+    ViewData["Title"] = "Detalles del Plan";
+}
+
+<h1>Detalles del Plan</h1>
+
+<hr />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Tipo de Plan</dt>
+        <dd class="col-sm-9">@Model.PlanType</dd>
+
+        <dt class="col-sm-3">Fecha de Creación</dt>
+        <dd class="col-sm-9">@Model.CreationDate.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Estado</dt>
+        <dd class="col-sm-9">
+            @if (Model.Status)
+            {
+                <span class="badge bg-success">Activo</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Inactivo</span>
+            }
+        </dd>
+    </dl>
+</div>
+
+@if (Model.PlanDetails.Any())
+{
+    <h4>Categorías del Plan</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Categoría</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detail in Model.PlanDetails)
+            {
+                <tr>
+                    <td>@detail.Category?.CategoryName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</div>

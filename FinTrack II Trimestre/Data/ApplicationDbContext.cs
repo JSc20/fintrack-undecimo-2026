@@ -16,5 +16,6 @@ namespace FinTrack_II_Trimestre.Data
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<BudgetPlan> BudgetPlans { get; set; }
         public DbSet<PlanDetail> PlanDetails { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

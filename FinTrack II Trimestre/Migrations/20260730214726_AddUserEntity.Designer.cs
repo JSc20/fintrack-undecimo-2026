@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinTrack_II_Trimestre.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260727061131_Profile")]
-    partial class Profile
+    [Migration("20260730214726_AddUserEntity")]
+    partial class AddUserEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,35 @@ namespace FinTrack_II_Trimestre.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.BudgetPlan", b =>
+                {
+                    b.Property<int>("PlanId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PlanType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PlanId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BudgetPlans");
+                });
 
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Category", b =>
                 {
@@ -110,6 +139,29 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.ToTable("Incomes");
                 });
 
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.PlanDetail", b =>
+                {
+                    b.Property<int>("DetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlanId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DetailId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("PlanDetails");
+                });
+
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Profile", b =>
                 {
                     b.Property<int>("ProfileId")
@@ -174,6 +226,49 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.ToTable("SavingsGoals");
                 });
 
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.User", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<int>("LoginAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("status")
+                        .HasColumnType("bit");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("name")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.BudgetPlan", b =>
+                {
+                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Expense", b =>
                 {
                     b.HasOne("FinTrack_II_Trimestre.Models.Category", "Category")
@@ -194,6 +289,30 @@ namespace FinTrack_II_Trimestre.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.PlanDetail", b =>
+                {
+                    b.HasOne("FinTrack_II_Trimestre.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinTrack_II_Trimestre.Models.BudgetPlan", "BudgetPlan")
+                        .WithMany("PlanDetails")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BudgetPlan");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("FinTrack_II_Trimestre.Models.BudgetPlan", b =>
+                {
+                    b.Navigation("PlanDetails");
                 });
 #pragma warning restore 612, 618
         }

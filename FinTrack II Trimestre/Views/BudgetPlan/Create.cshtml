@@ -1,0 +1,30 @@
+@model BudgetPlan
+
+@{
+    ViewData["Title"] = "Nuevo Plan de Ahorro";
+}
+
+<h1>Nuevo Plan de Ahorro</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="PlanType" class="form-control" placeholder="Tipo de plan" />
+                <label asp-for="PlanType">Tipo de Plan</label>
+                <span asp-validation-for="PlanType" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Plan</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
