@@ -24,5 +24,11 @@ namespace FinTrack_II_Trimestre.Models
         [Required(ErrorMessage = "El número de teléfono es obligatorio.")]
         [RegularExpression(@"^\d{8}$", ErrorMessage = "El número de teléfono debe contener exactamente 8 dígitos numéricos.")]
         public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo electrónico es obligatorio.")]
+        [EmailAddress(ErrorMessage = "El correo debe tener un formato válido (debe incluir @)")]
+        [RegularExpression(@".*\..*", ErrorMessage = "El correo debe incluir un dominio con punto (ej: .com)")]
+
+        public string Email { get; set; }
     }
 }
