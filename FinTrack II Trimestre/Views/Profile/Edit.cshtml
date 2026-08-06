@@ -1,0 +1,44 @@
+@model Profile
+
+@{
+    ViewData["Title"] = "Editar Perfil";
+}
+
+<h1>Editar Perfil</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="ProfileId" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="FullName" class="form-control" placeholder="Nombre completo" />
+                <label asp-for="FullName">Nombre Completo</label>
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Age" class="form-control" placeholder="Edad" />
+                <label asp-for="Age">Edad</label>
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Teléfono" />
+                <label asp-for="PhoneNumber">Teléfono</label>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
