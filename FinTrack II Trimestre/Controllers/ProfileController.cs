@@ -1,6 +1,7 @@
 using FinTrack_II_Trimestre.Data;
 using FinTrack_II_Trimestre.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinTrack_II_Trimestre.Controllers
 {
@@ -13,16 +14,45 @@ namespace FinTrack_II_Trimestre.Controllers
             _db = db;
         }
 
-        // GET: Profile
+        // Método auxiliar: obtener UserId de la sesión activa
+        private int? GetSessionUserId() => HttpContext.Session.GetInt32("UserId");
+
+        // Redirige a login si no hay sesión activa
+        private IActionResult? CheckSession()
+        {
+            if (GetSessionUserId() == null)
+                return RedirectToAction("Login", "User");
+            return null;
+        }
+
+        // GET: Profile — muestra el perfil del usuario en sesión
         public IActionResult Index()
         {
-            IEnumerable<Profile> profiles = _db.Profiles;
-            return View(profiles);
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var profile = _db.Profiles.FirstOrDefault(p => p.UserId == userId);
+
+            // Si no tiene perfil creado, redirigir a creación
+            if (profile == null)
+                return RedirectToAction(nameof(Create));
+
+            return View(profile);
         }
 
         // GET: Profile/Create
         public IActionResult Create()
         {
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+
+            // Un usuario solo puede tener un perfil
+            if (_db.Profiles.Any(p => p.UserId == userId))
+                return RedirectToAction(nameof(Index));
+
             return View();
         }
 
@@ -31,21 +61,42 @@ namespace FinTrack_II_Trimestre.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Profile profile)
         {
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+
+            // Prevenir duplicado de perfil
+            if (_db.Profiles.Any(p => p.UserId == userId))
+            {
+                TempData["ErrorMessage"] = "Ya tienes un perfil creado.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Asignar el UserId de la sesión activa
+            profile.UserId = userId;
+
             if (ModelState.IsValid)
             {
                 _db.Profiles.Add(profile);
                 _db.SaveChanges();
+                TempData["SuccessMessage"] = "Perfil creado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
+
             return View(profile);
         }
 
-        // GET: Profile/Edit/5
-        public IActionResult Edit(int? id)
+        // GET: Profile/Edit
+        public IActionResult Edit()
         {
-            if (id == null || id == 0) { return NotFound(); }
-            var profile = _db.Profiles.Find(id);
-            if (profile == null) { return NotFound(); }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var profile = _db.Profiles.FirstOrDefault(p => p.UserId == userId);
+
+            if (profile == null) return RedirectToAction(nameof(Create));
             return View(profile);
         }
 
@@ -54,33 +105,54 @@ namespace FinTrack_II_Trimestre.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Profile profile)
         {
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+
+            // Evitar que se edite el perfil de otro usuario
+            profile.UserId = userId;
+
             if (ModelState.IsValid)
             {
                 _db.Profiles.Update(profile);
                 _db.SaveChanges();
+                TempData["SuccessMessage"] = "Perfil actualizado exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
+
             return View(profile);
         }
 
-        // GET: Profile/Delete/5
-        public IActionResult Delete(int? id)
+        // GET: Profile/Delete
+        public IActionResult Delete()
         {
-            if (id == null || id == 0) { return NotFound(); }
-            var profile = _db.Profiles.FirstOrDefault(p => p.ProfileId == id);
-            if (profile == null) { return NotFound(); }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var profile = _db.Profiles.FirstOrDefault(p => p.UserId == userId);
+
+            if (profile == null) return NotFound();
             return View(profile);
         }
 
-        // POST: Profile/Delete
+        // POST: Profile/DeleteConfirm
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirm(int id)
         {
-            var profile = _db.Profiles.Find(id);
-            if (profile == null) { return NotFound(); }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var profile = _db.Profiles.FirstOrDefault(p => p.ProfileId == id && p.UserId == userId);
+
+            if (profile == null) return NotFound();
+
             _db.Profiles.Remove(profile);
             _db.SaveChanges();
+            TempData["SuccessMessage"] = "Perfil eliminado.";
             return RedirectToAction(nameof(Index));
         }
     }

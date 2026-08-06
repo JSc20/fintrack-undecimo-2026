@@ -32,6 +32,13 @@ namespace FinTrack_II_Trimestre.Models
         [DataType(DataType.Date)]
         public DateTime IncomeDate { get; set; }
 
+        // RF-04: Ingresos fijos y variables
+        public bool IsFixed { get; set; } = false;
+
+        // RF-04: Frecuencia para ingresos fijos (Mensual, Quincenal, Semanal)
+        [StringLength(20)]
+        public string? Frequency { get; set; }
+
         // Propiedad de navegación hacia Category
         [ForeignKey("CategoryId")]
         public virtual Category? Category { get; set; }
