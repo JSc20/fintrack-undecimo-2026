@@ -17,6 +17,7 @@ namespace FinTrack_II_Trimestre.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Register(User user)
         {
             // Validaciones
@@ -54,6 +55,7 @@ namespace FinTrack_II_Trimestre.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login(UserLoginModel model)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == model.Username);

@@ -12,6 +12,9 @@ namespace FinTrack_II_Trimestre.Models
 
         public int UserId { get; set; }
 
+        [ForeignKey("UserId")]
+        public virtual User? User { get; set; }
+
         [Required(ErrorMessage = "El nombre completo es obligatorio.")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 100 caracteres.")]
         [RegularExpression(@"^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$", ErrorMessage = "El nombre solo debe contener letras, sin caracteres especiales ni números.")]
@@ -29,6 +32,6 @@ namespace FinTrack_II_Trimestre.Models
         [EmailAddress(ErrorMessage = "El correo debe tener un formato válido (debe incluir @)")]
         [RegularExpression(@".*\..*", ErrorMessage = "El correo debe incluir un dominio con punto (ej: .com)")]
 
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
     }
 }

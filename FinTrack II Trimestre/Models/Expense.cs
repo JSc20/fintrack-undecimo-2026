@@ -11,6 +11,10 @@ namespace FinTrack_II_Trimestre.Models
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         public int UserId { get; set; }
 
+        // Propiedad de navegación hacia User
+        [ForeignKey("UserId")]
+        public virtual User? User { get; set; }
+
         // RN-02: Toda transacción debe estar vinculada obligatoriamente a una categoría
         [Required(ErrorMessage = "La categoría es obligatoria.")]
         public int CategoryId { get; set; }
