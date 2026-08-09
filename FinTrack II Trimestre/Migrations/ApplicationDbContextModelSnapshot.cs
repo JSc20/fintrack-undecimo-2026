@@ -70,6 +70,9 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.Property<bool>("CategoryStatus")
                         .HasColumnType("bit");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");

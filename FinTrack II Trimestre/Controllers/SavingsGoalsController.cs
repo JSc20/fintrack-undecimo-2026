@@ -1,153 +1,193 @@
-
+using FinTrack_II_Trimestre.Data;
+using FinTrack_II_Trimestre.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using FinTrack_II_Trimestre.Models;
-using FinTrack_II_Trimestre.Data;
 
 namespace FinTrack_II_Trimestre.Controllers
 {
-    public class SavingsGoalsController : Controller
-    {
-        private readonly ApplicationDbContext _context;
+	public class SavingsGoalController : BaseController
+	{
+		private readonly ApplicationDbContext _db;
 
-        public SavingsGoalsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+		public SavingsGoalController(ApplicationDbContext db)
+		{
+			_db = db;
+		}
 
-        // GET: SAVINGSGOALS
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.SavingsGoals.ToListAsync());
-        }
+		// GET: SavingsGoal
+		public IActionResult Index()
+		{
+			int userId = GetCurrentUserId();
+			IEnumerable<SavingsGoal> goals = _db.SavingsGoals.Where(g => g.UserId == userId);
+			return View(goals);
+		}
 
-        // GET: SAVINGSGOALS/Details/5
-        public async Task<IActionResult> Details(int? goalid)
-        {
-            if (goalid == null)
-            {
-                return NotFound();
-            }
+		// GET: SavingsGoal/Create
+		public IActionResult Create()
+		{
+			return View();
+		}
 
-            var savingsgoal = await _context.SavingsGoals
-                .FirstOrDefaultAsync(m => m.GoalId == goalid);
-            if (savingsgoal == null)
-            {
-                return NotFound();
-            }
+		// POST: SavingsGoal/Create
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult Create(SavingsGoal goal)
+		{
+			int userId = GetCurrentUserId();
+			goal.UserId = userId;
 
-            return View(savingsgoal);
-        }
+			bool nombreExiste = _db.SavingsGoals.Any(g => g.UserId == userId && g.GoalName == goal.GoalName);
+			if (nombreExiste)
+			{
+				ModelState.AddModelError("GoalName", "Ya tienes una meta de ahorro con ese nombre.");
+			}
 
-        // GET: SAVINGSGOALS/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+			if (goal.CurrentAmount > goal.TargetAmount)
+			{
+				ModelState.AddModelError("CurrentAmount", "El monto actual no puede ser mayor al monto objetivo.");
+			}
 
-        // POST: SAVINGSGOALS/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("GoalId,UserId,GoalName,TargetAmount,CurrentAmount,TargetDate,Status")] SavingsGoal savingsgoal)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(savingsgoal);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(savingsgoal);
-        }
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_db.SavingsGoals.Add(goal);
+					_db.SaveChanges();
+					TempData["Success"] = "Meta de ahorro creada correctamente.";
+					return RedirectToAction(nameof(Index));
+				}
+				catch (Exception)
+				{
+					ModelState.AddModelError("", "Ocurrió un error al guardar la meta. Intenta de nuevo.");
+				}
+			}
 
-        // GET: SAVINGSGOALS/Edit/5
-        public async Task<IActionResult> Edit(int? goalid)
-        {
-            if (goalid == null)
-            {
-                return NotFound();
-            }
+			return View(goal);
+		}
 
-            var savingsgoal = await _context.SavingsGoals.FindAsync(goalid);
-            if (savingsgoal == null)
-            {
-                return NotFound();
-            }
-            return View(savingsgoal);
-        }
+		// GET: SavingsGoal/Edit/5
+		public IActionResult Edit(int? id)
+		{
+			if (id == null || id == 0)
+			{
+				return NotFound();
+			}
 
-        // POST: SAVINGSGOALS/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? goalid, [Bind("GoalId,UserId,GoalName,TargetAmount,CurrentAmount,TargetDate,Status")] SavingsGoal savingsgoal)
-        {
-            if (goalid != savingsgoal.GoalId)
-            {
-                return NotFound();
-            }
+			int userId = GetCurrentUserId();
+			var goal = _db.SavingsGoals.FirstOrDefault(g => g.GoalId == id);
+			if (goal == null)
+			{
+				return NotFound();
+			}
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(savingsgoal);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SavingsGoalExists(savingsgoal.GoalId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(savingsgoal);
-        }
+			if (goal.UserId != userId)
+			{
+				return Forbid();
+			}
 
-        // GET: SAVINGSGOALS/Delete/5
-        public async Task<IActionResult> Delete(int? goalid)
-        {
-            if (goalid == null)
-            {
-                return NotFound();
-            }
+			return View(goal);
+		}
 
-            var savingsgoal = await _context.SavingsGoals
-                .FirstOrDefaultAsync(m => m.GoalId == goalid);
-            if (savingsgoal == null)
-            {
-                return NotFound();
-            }
+		// POST: SavingsGoal/Edit
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult Edit(SavingsGoal goal)
+		{
+			int userId = GetCurrentUserId();
+			var existing = _db.SavingsGoals.AsNoTracking().FirstOrDefault(g => g.GoalId == goal.GoalId);
+			if (existing == null)
+			{
+				return NotFound();
+			}
 
-            return View(savingsgoal);
-        }
+			if (existing.UserId != userId)
+			{
+				return Forbid();
+			}
 
-        // POST: SAVINGSGOALS/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? goalid)
-        {
-            var savingsgoal = await _context.SavingsGoals.FindAsync(goalid);
-            if (savingsgoal != null)
-            {
-                _context.SavingsGoals.Remove(savingsgoal);
-            }
+			goal.UserId = userId;
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+			bool nombreExiste = _db.SavingsGoals.Any(g => g.UserId == userId && g.GoalName == goal.GoalName && g.GoalId != goal.GoalId);
+			if (nombreExiste)
+			{
+				ModelState.AddModelError("GoalName", "Ya tienes una meta de ahorro con ese nombre.");
+			}
 
-        private bool SavingsGoalExists(int? goalid)
-        {
-            return _context.SavingsGoals.Any(e => e.GoalId == goalid);
-        }
-    }
+			if (goal.CurrentAmount > goal.TargetAmount)
+			{
+				ModelState.AddModelError("CurrentAmount", "El monto actual no puede ser mayor al monto objetivo.");
+			}
+
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_db.SavingsGoals.Update(goal);
+					_db.SaveChanges();
+					TempData["Success"] = "Meta de ahorro actualizada correctamente.";
+					return RedirectToAction(nameof(Index));
+				}
+				catch (Exception)
+				{
+					ModelState.AddModelError("", "Ocurrió un error al actualizar la meta. Intenta de nuevo.");
+				}
+			}
+
+			return View(goal);
+		}
+
+		// GET: SavingsGoal/Delete/5
+		public IActionResult Delete(int? id)
+		{
+			if (id == null || id == 0)
+			{
+				return NotFound();
+			}
+
+			int userId = GetCurrentUserId();
+			var goal = _db.SavingsGoals.FirstOrDefault(g => g.GoalId == id);
+			if (goal == null)
+			{
+				return NotFound();
+			}
+
+			if (goal.UserId != userId)
+			{
+				return Forbid();
+			}
+
+			return View(goal);
+		}
+
+		// POST: SavingsGoal/Delete
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public IActionResult DeleteConfirm(int id)
+		{
+			int userId = GetCurrentUserId();
+			var goal = _db.SavingsGoals.FirstOrDefault(g => g.GoalId == id);
+			if (goal == null)
+			{
+				return NotFound();
+			}
+
+			if (goal.UserId != userId)
+			{
+				return Forbid();
+			}
+
+			try
+			{
+				_db.SavingsGoals.Remove(goal);
+				_db.SaveChanges();
+				TempData["Success"] = "Meta de ahorro eliminada correctamente.";
+			}
+			catch (Exception)
+			{
+				TempData["Error"] = "Ocurrió un error al eliminar la meta.";
+			}
+
+			return RedirectToAction(nameof(Index));
+		}
+	}
 }
