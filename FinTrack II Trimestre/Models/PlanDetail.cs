@@ -10,12 +10,13 @@ namespace FinTrack_II_Trimestre.Models
 
         public int PlanId { get; set; }
 
-        [ForeignKey(nameof(PlanId))]    
-        public virtual BudgetPlan? BudgetPlan { get; set; } 
+        [ForeignKey(nameof(PlanId))]
+        public virtual BudgetPlan? BudgetPlan { get; set; }
 
         public int CategoryId { get; set; }
 
         [ForeignKey(nameof(CategoryId))]
         public virtual Category? Category { get; set; }
+
     }
 }
