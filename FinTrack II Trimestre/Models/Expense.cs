@@ -11,6 +11,10 @@ namespace FinTrack_II_Trimestre.Models
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         public int UserId { get; set; }
 
+        // Propiedad de navegación hacia User
+        [ForeignKey("UserId")]
+        public virtual User? User { get; set; }
+
         // RN-02: Toda transacción debe estar vinculada obligatoriamente a una categoría
         [Required(ErrorMessage = "La categoría es obligatoria.")]
         public int CategoryId { get; set; }
@@ -23,6 +27,17 @@ namespace FinTrack_II_Trimestre.Models
         [Column(TypeName = "decimal(18,2)")]
         [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0.")]
         public decimal ExpenseAmount { get; set; }
+
+        // RF-02: Toda transacción debe tener fecha
+        [Required(ErrorMessage = "La fecha del gasto es obligatoria.")]
+        [DataType(DataType.Date)]
+        public DateTime ExpenseDate { get; set; }
+
+        // RF-07: Soporte para egresos fijos con fecha de vencimiento mensual
+        public bool IsFixed { get; set; } = false;
+
+        [DataType(DataType.Date)]
+        public DateTime? DueDate { get; set; }
 
         // Propiedad de navegación hacia Category
         [ForeignKey("CategoryId")]

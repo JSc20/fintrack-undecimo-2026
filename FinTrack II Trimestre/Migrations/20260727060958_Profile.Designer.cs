@@ -4,6 +4,7 @@ using FinTrack_II_Trimestre.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinTrack_II_Trimestre.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727060958_Profile")]
+    partial class Profile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,35 +24,6 @@ namespace FinTrack_II_Trimestre.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.BudgetPlan", b =>
-                {
-                    b.Property<int>("PlanId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlanId"));
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PlanType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PlanId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BudgetPlans");
-                });
 
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Category", b =>
                 {
@@ -70,9 +44,6 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.Property<bool>("CategoryStatus")
                         .HasColumnType("bit");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
@@ -89,22 +60,13 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("DueDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("ExpenseAmount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("ExpenseDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("ExpenseName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsFixed")
-                        .HasColumnType("bit");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -112,8 +74,6 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.HasKey("ExpenseId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Expenses");
                 });
@@ -129,10 +89,6 @@ namespace FinTrack_II_Trimestre.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Frequency")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<decimal>("IncomeAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -144,9 +100,6 @@ namespace FinTrack_II_Trimestre.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("IsFixed")
-                        .HasColumnType("bit");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -154,32 +107,7 @@ namespace FinTrack_II_Trimestre.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Incomes");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.PlanDetail", b =>
-                {
-                    b.Property<int>("DetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DetailId"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlanId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DetailId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("PlanId");
-
-                    b.ToTable("PlanDetails");
                 });
 
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Profile", b =>
@@ -192,10 +120,6 @@ namespace FinTrack_II_Trimestre.Migrations
 
                     b.Property<int>("Age")
                         .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -213,8 +137,6 @@ namespace FinTrack_II_Trimestre.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("ProfileId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Profiles");
                 });
@@ -249,51 +171,7 @@ namespace FinTrack_II_Trimestre.Migrations
 
                     b.HasKey("GoalId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("SavingsGoals");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.User", b =>
-                {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<DateTime?>("LockoutEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("LoginAttempts")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.BudgetPlan", b =>
-                {
-                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Expense", b =>
@@ -304,15 +182,7 @@ namespace FinTrack_II_Trimestre.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FinTrack_II_Trimestre.Models.Income", b =>
@@ -323,56 +193,7 @@ namespace FinTrack_II_Trimestre.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.PlanDetail", b =>
-                {
-                    b.HasOne("FinTrack_II_Trimestre.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinTrack_II_Trimestre.Models.BudgetPlan", "BudgetPlan")
-                        .WithMany()
-                        .HasForeignKey("PlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BudgetPlan");
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.Profile", b =>
-                {
-                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FinTrack_II_Trimestre.Models.SavingsGoal", b =>
-                {
-                    b.HasOne("FinTrack_II_Trimestre.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

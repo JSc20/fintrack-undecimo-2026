@@ -58,7 +58,7 @@ namespace FinTrack_II_Trimestre.Controllers
 				}
 				catch (Exception)
 				{
-					ModelState.AddModelError("", "Ocurrió un error al guardar la meta. Intenta de nuevo.");
+					ModelState.AddModelError("", "OcurriÃ³ un error al guardar la meta. Intenta de nuevo.");
 				}
 			}
 
@@ -129,7 +129,7 @@ namespace FinTrack_II_Trimestre.Controllers
 				}
 				catch (Exception)
 				{
-					ModelState.AddModelError("", "Ocurrió un error al actualizar la meta. Intenta de nuevo.");
+					ModelState.AddModelError("", "OcurriÃ³ un error al actualizar la meta. Intenta de nuevo.");
 				}
 			}
 
@@ -184,7 +184,7 @@ namespace FinTrack_II_Trimestre.Controllers
 			}
 			catch (Exception)
 			{
-				TempData["Error"] = "Ocurrió un error al eliminar la meta.";
+				TempData["Error"] = "OcurriÃ³ un error al eliminar la meta.";
 			}
 
 			return RedirectToAction(nameof(Index));

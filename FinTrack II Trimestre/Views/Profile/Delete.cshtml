@@ -1,0 +1,30 @@
+@model Profile
+
+@{
+    ViewData["Title"] = "Eliminar Perfil";
+}
+
+<h1>Eliminar Perfil</h1>
+
+<div class="alert alert-danger">
+    ¿Estás seguro de eliminar este perfil?
+</div>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Nombre Completo</dt>
+        <dd class="col-sm-9">@Model.FullName</dd>
+
+        <dt class="col-sm-3">Edad</dt>
+        <dd class="col-sm-9">@Model.Age</dd>
+
+        <dt class="col-sm-3">Teléfono</dt>
+        <dd class="col-sm-9">@Model.PhoneNumber</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirm" method="post">
+        <input type="hidden" name="id" value="@Model.ProfileId" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

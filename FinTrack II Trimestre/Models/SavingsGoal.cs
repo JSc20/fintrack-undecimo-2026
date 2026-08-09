@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinTrack_II_Trimestre.Models
@@ -11,6 +11,10 @@ namespace FinTrack_II_Trimestre.Models
 
 		[Required]
 		public int UserId { get; set; }
+
+		// Propiedad de navegación hacia User
+		[ForeignKey("UserId")]
+		public virtual User? User { get; set; }
 
 		[Required(ErrorMessage = "El nombre de la meta es obligatorio.")]
 		[StringLength(50, MinimumLength = 2, ErrorMessage = "El nombre debe tener entre 2 y 50 caracteres.")]

@@ -1,0 +1,42 @@
+@model IEnumerable<Profile>
+
+@{
+    ViewData["Title"] = "Perfiles";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Perfiles</h1>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Perfil</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay perfiles registrados.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre Completo</th>
+                <th>Edad</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var profile in Model)
+            {
+                <tr>
+                    <td>@profile.FullName</td>
+                    <td>@profile.Age</td>
+                    <td>@profile.PhoneNumber</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@profile.ProfileId" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@profile.ProfileId" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -11,6 +11,10 @@ namespace FinTrack_II_Trimestre.Models
         [Required(ErrorMessage = "El usuario es obligatorio.")]
         public int UserId { get; set; }
 
+        // Propiedad de navegación hacia User
+        [ForeignKey("UserId")]
+        public virtual User? User { get; set; }
+
         // RN-02: Toda transacción debe estar vinculada obligatoriamente a una categoría
         [Required(ErrorMessage = "La categoría es obligatoria.")]
         public int CategoryId { get; set; }
@@ -27,6 +31,13 @@ namespace FinTrack_II_Trimestre.Models
         [Required(ErrorMessage = "La fecha del ingreso es obligatoria.")]
         [DataType(DataType.Date)]
         public DateTime IncomeDate { get; set; }
+
+        // RF-04: Ingresos fijos y variables
+        public bool IsFixed { get; set; } = false;
+
+        // RF-04: Frecuencia para ingresos fijos (Mensual, Quincenal, Semanal)
+        [StringLength(20)]
+        public string? Frequency { get; set; }
 
         // Propiedad de navegación hacia Category
         [ForeignKey("CategoryId")]

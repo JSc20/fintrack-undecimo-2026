@@ -15,17 +15,49 @@ namespace FinTrack_II_Trimestre.Controllers
             _db = db;
         }
 
-        // GET: Income
+        // Método auxiliar: obtener UserId de sesión
+        private int? GetSessionUserId() => HttpContext.Session.GetInt32("UserId");
+
+        // Redirige a login si no hay sesión activa
+        private IActionResult? CheckSession()
+        {
+            if (GetSessionUserId() == null)
+                return RedirectToAction("Login", "User");
+            return null;
+        }
+
+        // GET: Income — lista ingresos del usuario en sesión
         public IActionResult Index()
         {
-            IEnumerable<Income> incomes = _db.Incomes.Include(i => i.Category);
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var incomes = _db.Incomes
+                .Include(i => i.Category)
+                .Where(i => i.UserId == userId)
+                .OrderByDescending(i => i.IncomeDate)
+                .ToList();
+
+            // RF-03: Calcular total de ingresos del mes actual para el dashboard
+            var mesActual = DateTime.Now;
+            var totalIngresosMes = incomes
+                .Where(i => i.IncomeDate.Month == mesActual.Month && i.IncomeDate.Year == mesActual.Year)
+                .Sum(i => i.IncomeAmount);
+
+            ViewBag.TotalIngresosMes = totalIngresosMes;
+
             return View(incomes);
         }
 
         // GET: Income/Create
         public IActionResult Create()
         {
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "CategoryName");
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus), "CategoryId", "CategoryName");
+            ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" });
             return View();
         }
 
@@ -34,49 +66,62 @@ namespace FinTrack_II_Trimestre.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Income income)
         {
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+
             // RN-02: Validar existencia de la categoría
             var categoryExists = _db.Categories.Any(c => c.CategoryId == income.CategoryId);
             if (!categoryExists)
-            {
                 ModelState.AddModelError("CategoryId", "La categoría seleccionada no existe.");
-            }
 
-            // Validar que la fecha no sea posterior al día de hoy
+            // RF-02: Validar que la fecha no sea posterior al día de hoy
             if (income.IncomeDate > DateTime.Now)
-            {
                 ModelState.AddModelError("IncomeDate", "La fecha del ingreso no puede ser posterior al día de hoy.");
-            }
 
-            if (ModelState.IsValid)
+            // RF-04: Si es fijo, la frecuencia es obligatoria
+            if (income.IsFixed && string.IsNullOrEmpty(income.Frequency))
+                ModelState.AddModelError("Frequency", "Los ingresos fijos requieren una frecuencia (Mensual, Quincenal o Semanal).");
+
+            // RF-04: Si es variable, no debe tener frecuencia
+            if (!income.IsFixed)
+                income.Frequency = null;
+
+            if (!ModelState.IsValid)
             {
-                _db.Incomes.Add(income);
-                _db.SaveChanges();
-
-                // RN-07: Recalcular montos por categoría si hay un plan activo
-                // TODO: Implementar cuando el módulo BudgetPlan esté disponible
-
-                return RedirectToAction(nameof(Index));
+                ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
+                    "CategoryId", "CategoryName", income.CategoryId);
+                ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
+                return View(income);
             }
 
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "CategoryName", income.CategoryId);
-            return View(income);
+            // Asignar el usuario de la sesión
+            income.UserId = userId;
+
+            _db.Incomes.Add(income);
+            _db.SaveChanges();
+
+            // RN-07: Recálculo de plan activo — pendiente de módulo BudgetPlan
+            TempData["SuccessMessage"] = "Ingreso registrado exitosamente.";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Income/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
 
-            var income = _db.Incomes.Find(id);
-            if (income == null)
-            {
-                return NotFound();
-            }
+            if (id == null || id == 0) return NotFound();
 
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "CategoryName", income.CategoryId);
+            int userId = GetSessionUserId()!.Value;
+            var income = _db.Incomes.FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
+            if (income == null) return NotFound();
+
+            ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
+                "CategoryId", "CategoryName", income.CategoryId);
+            ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
             return View(income);
         }
 
@@ -85,64 +130,81 @@ namespace FinTrack_II_Trimestre.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Income income)
         {
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+
             // RN-02: Validar existencia de la categoría
             var categoryExists = _db.Categories.Any(c => c.CategoryId == income.CategoryId);
             if (!categoryExists)
-            {
                 ModelState.AddModelError("CategoryId", "La categoría seleccionada no existe.");
-            }
 
-            // Validar que la fecha no sea posterior al día de hoy
+            // RF-02: Validar fecha no futura
             if (income.IncomeDate > DateTime.Now)
-            {
                 ModelState.AddModelError("IncomeDate", "La fecha del ingreso no puede ser posterior al día de hoy.");
-            }
 
-            if (ModelState.IsValid)
+            // RF-04: Si es fijo, frecuencia obligatoria
+            if (income.IsFixed && string.IsNullOrEmpty(income.Frequency))
+                ModelState.AddModelError("Frequency", "Los ingresos fijos requieren una frecuencia.");
+
+            if (!income.IsFixed)
+                income.Frequency = null;
+
+            if (!ModelState.IsValid)
             {
-                _db.Incomes.Update(income);
-                _db.SaveChanges();
-
-                // RN-07: Recalcular montos por categoría según el plan activo
-                // TODO: Implementar cuando el módulo BudgetPlan esté disponible
-
-                return RedirectToAction(nameof(Index));
+                ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
+                    "CategoryId", "CategoryName", income.CategoryId);
+                ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
+                return View(income);
             }
 
-            ViewBag.Categories = new SelectList(_db.Categories, "CategoryId", "CategoryName", income.CategoryId);
-            return View(income);
+            // Mantener UserId de sesión para evitar suplantación
+            income.UserId = userId;
+
+            _db.Incomes.Update(income);
+            _db.SaveChanges();
+
+            // RN-07: Recálculo automático de plan activo al modificar ingreso — pendiente de módulo BudgetPlan
+            TempData["SuccessMessage"] = "Ingreso actualizado exitosamente.";
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Income/Delete/5
         public IActionResult Delete(int? id)
         {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
 
-            var income = _db.Incomes.Include(i => i.Category).FirstOrDefault(i => i.IncomeId == id);
-            if (income == null)
-            {
-                return NotFound();
-            }
+            if (id == null || id == 0) return NotFound();
 
+            int userId = GetSessionUserId()!.Value;
+            var income = _db.Incomes
+                .Include(i => i.Category)
+                .FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
+
+            if (income == null) return NotFound();
             return View(income);
         }
 
-        // POST: Income/Delete
+        // POST: Income/DeleteConfirm
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirm(int id)
         {
-            var income = _db.Incomes.Find(id);
-            if (income == null)
-            {
-                return NotFound();
-            }
+            var redirect = CheckSession();
+            if (redirect != null) return redirect;
+
+            int userId = GetSessionUserId()!.Value;
+            var income = _db.Incomes.FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
+
+            if (income == null) return NotFound();
 
             _db.Incomes.Remove(income);
             _db.SaveChanges();
+
+            // RN-07: Recálculo de plan — pendiente de módulo BudgetPlan
+            TempData["SuccessMessage"] = "Ingreso eliminado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
     }
