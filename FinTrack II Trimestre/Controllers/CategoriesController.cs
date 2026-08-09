@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinTrack_II_Trimestre.Controllers
 {
-	public class CategoryController : Controller
+	public class CategoryController : BaseController
 	{
 		private readonly ApplicationDbContext _db;
 
@@ -17,7 +17,8 @@ namespace FinTrack_II_Trimestre.Controllers
 		// GET: Category
 		public IActionResult Index()
 		{
-			IEnumerable<Category> categories = _db.Categories;
+			int userId = GetCurrentUserId();
+			IEnumerable<Category> categories = _db.Categories.Where(c => c.UserId == userId);
 			return View(categories);
 		}
 
@@ -32,8 +33,10 @@ namespace FinTrack_II_Trimestre.Controllers
 		[ValidateAntiForgeryToken]
 		public IActionResult Create(Category category)
 		{
-			// RN-01: Nombre de categoría único
-			bool nombreExiste = _db.Categories.Any(c => c.CategoryName == category.CategoryName);
+			int userId = GetCurrentUserId();
+			category.UserId = userId;
+
+			bool nombreExiste = _db.Categories.Any(c => c.UserId == userId && c.CategoryName == category.CategoryName);
 			if (nombreExiste)
 			{
 				ModelState.AddModelError("CategoryName", "Ya existe una categoría con ese nombre.");
@@ -41,9 +44,17 @@ namespace FinTrack_II_Trimestre.Controllers
 
 			if (ModelState.IsValid)
 			{
-				_db.Categories.Add(category);
-				_db.SaveChanges();
-				return RedirectToAction(nameof(Index));
+				try
+				{
+					_db.Categories.Add(category);
+					_db.SaveChanges();
+					TempData["Success"] = "Categoría creada correctamente.";
+					return RedirectToAction(nameof(Index));
+				}
+				catch (Exception)
+				{
+					ModelState.AddModelError("", "Ocurrió un error al guardar la categoría. Intenta de nuevo.");
+				}
 			}
 
 			return View(category);
@@ -57,10 +68,16 @@ namespace FinTrack_II_Trimestre.Controllers
 				return NotFound();
 			}
 
-			var category = _db.Categories.Find(id);
+			int userId = GetCurrentUserId();
+			var category = _db.Categories.FirstOrDefault(c => c.CategoryId == id);
 			if (category == null)
 			{
 				return NotFound();
+			}
+
+			if (category.UserId != userId)
+			{
+				return Forbid();
 			}
 
 			return View(category);
@@ -71,8 +88,21 @@ namespace FinTrack_II_Trimestre.Controllers
 		[ValidateAntiForgeryToken]
 		public IActionResult Edit(Category category)
 		{
-			// RN-01: Nombre de categoría único (excluyendo el registro actual)
-			bool nombreExiste = _db.Categories.Any(c => c.CategoryName == category.CategoryName && c.CategoryId != category.CategoryId);
+			int userId = GetCurrentUserId();
+			var existing = _db.Categories.AsNoTracking().FirstOrDefault(c => c.CategoryId == category.CategoryId);
+			if (existing == null)
+			{
+				return NotFound();
+			}
+
+			if (existing.UserId != userId)
+			{
+				return Forbid();
+			}
+
+			category.UserId = userId;
+
+			bool nombreExiste = _db.Categories.Any(c => c.UserId == userId && c.CategoryName == category.CategoryName && c.CategoryId != category.CategoryId);
 			if (nombreExiste)
 			{
 				ModelState.AddModelError("CategoryName", "Ya existe una categoría con ese nombre.");
@@ -80,9 +110,17 @@ namespace FinTrack_II_Trimestre.Controllers
 
 			if (ModelState.IsValid)
 			{
-				_db.Categories.Update(category);
-				_db.SaveChanges();
-				return RedirectToAction(nameof(Index));
+				try
+				{
+					_db.Categories.Update(category);
+					_db.SaveChanges();
+					TempData["Success"] = "Categoría actualizada correctamente.";
+					return RedirectToAction(nameof(Index));
+				}
+				catch (Exception)
+				{
+					ModelState.AddModelError("", "Ocurrió un error al actualizar la categoría. Intenta de nuevo.");
+				}
 			}
 
 			return View(category);
@@ -96,10 +134,16 @@ namespace FinTrack_II_Trimestre.Controllers
 				return NotFound();
 			}
 
+			int userId = GetCurrentUserId();
 			var category = _db.Categories.FirstOrDefault(c => c.CategoryId == id);
 			if (category == null)
 			{
 				return NotFound();
+			}
+
+			if (category.UserId != userId)
+			{
+				return Forbid();
 			}
 
 			return View(category);
@@ -110,13 +154,18 @@ namespace FinTrack_II_Trimestre.Controllers
 		[ValidateAntiForgeryToken]
 		public IActionResult DeleteConfirm(int id)
 		{
-			var category = _db.Categories.Find(id);
+			int userId = GetCurrentUserId();
+			var category = _db.Categories.FirstOrDefault(c => c.CategoryId == id);
 			if (category == null)
 			{
 				return NotFound();
 			}
 
-			// Evitar borrar categorías que ya tienen gastos asociados
+			if (category.UserId != userId)
+			{
+				return Forbid();
+			}
+
 			bool tieneGastos = _db.Expenses.Any(e => e.CategoryId == id);
 			if (tieneGastos)
 			{
@@ -124,8 +173,17 @@ namespace FinTrack_II_Trimestre.Controllers
 				return RedirectToAction(nameof(Index));
 			}
 
-			_db.Categories.Remove(category);
-			_db.SaveChanges();
+			try
+			{
+				_db.Categories.Remove(category);
+				_db.SaveChanges();
+				TempData["Success"] = "Categoría eliminada correctamente.";
+			}
+			catch (Exception)
+			{
+				TempData["Error"] = "Ocurrió un error al eliminar la categoría.";
+			}
+
 			return RedirectToAction(nameof(Index));
 		}
 	}
