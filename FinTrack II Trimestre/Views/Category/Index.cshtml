@@ -1,7 +1,7 @@
-@page
-@model FinTrack_II_Trimestre.Models.Profile
+﻿@page
+@model FinTrack_II_Trimestre.Models.ViewModels.CategoryIndexViewModel
 @{
-    ViewData["Title"] = "Perfil";
+    ViewData["Title"] = "Categorias";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perfil - FinTrack</title>
+    <title>Categorias - FinTrack</title>
     <style>
         :root {
             --bg-dark: #0b0f1a;
@@ -25,7 +25,6 @@
             --accent-red: #e0453f;
             --sidebar-active: #1e3a8a33;
             --sidebar-active-border: #3b5fd9;
-            --input-bg: linear-gradient(90deg, #e9ecf1, #c7ccd6);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -177,71 +176,115 @@
         .page-header h1 { font-size: 1.6rem; font-weight: 700; }
         .page-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
 
-        /* ---------- BODY CONTENT ---------- */
-        .content-row {
-            display: flex;
-            gap: 24px;
-            margin-top: 30px;
-            align-items: flex-start;
+        /* ---------- STAT CARDS ---------- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin: 24px 0 28px;
         }
 
-        .profile-col {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .stat-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
         }
 
-        .avatar-wrapper {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 3px solid #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #101828;
-            margin-bottom: 26px;
-            font-size: 2.8rem;
-            color: #fff;
-        }
+        .stat-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
+        .stat-card .value { font-size: 1.1rem; font-weight: 700; }
+        .stat-card .value.income { color: var(--accent-green); }
+        .stat-card .value.expense { color: var(--accent-red); }
 
-        .profile-card {
-            width: 100%;
-            max-width: 420px;
+        /* ---------- CATEGORY LIST CARD ---------- */
+        .list-card {
             background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 28px 32px;
+            padding: 22px 28px;
+            min-height: 220px;
         }
 
-        .form-group { margin-bottom: 22px; }
-        .form-group:last-child { margin-bottom: 0; }
-
-        .form-group label {
-            display: block;
+        .list-card .list-title {
             text-align: center;
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .form-group .display-value {
-            width: 100%;
-            border-radius: 6px;
-            padding: 10px 12px;
-            background: var(--input-bg);
+        .category-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-row:last-child { border-bottom: none; }
+
+        .category-name {
+            font-weight: 600;
             font-size: 0.9rem;
-            color: #333;
-            text-align: center;
-            min-height: 38px;
+            flex: 1 1 auto;
         }
 
+        .category-percentage {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            flex: 0 0 70px;
+            text-align: center;
+        }
+
+        .category-status {
+            flex: 0 0 90px;
+            text-align: center;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .category-status.active { color: var(--accent-green); }
+        .category-status.inactive { color: var(--accent-red); }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .icon-btn.edit { background-color: var(--accent-blue); }
+        .icon-btn.delete { background-color: var(--accent-red); }
+
+        .empty-message {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 40px 0;
+        }
+
+        /* ---------- BOTTOM ACTIONS ---------- */
         .actions-row {
             display: flex;
             gap: 14px;
             justify-content: center;
-            margin-top: 28px;
+            margin-top: 24px;
             flex-wrap: wrap;
         }
 
@@ -262,6 +305,8 @@
 
         .btn:hover { filter: brightness(1.15); }
 
+        .btn-crear { background-color: var(--accent-green); }
+
         .btn-eliminar {
             background-color: transparent;
             border: 1px solid var(--accent-red);
@@ -270,38 +315,9 @@
 
         .btn-eliminar:hover { background-color: var(--accent-red); color: #fff; }
 
-        /* ---------- STAT CARDS (side column) ---------- */
-        .stats-col {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            width: 220px;
-            flex-shrink: 0;
-        }
-
-        .stat-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px 16px;
-            text-align: center;
-        }
-
-        .stat-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
-        .stat-card .value { font-size: 1.15rem; font-weight: 700; }
-
         /* ---------- RESPONSIVE ---------- */
-        @@media (max-width: 900px) {
-            .content-row { flex-direction: column; align-items: center; }
-
-            .stats-col {
-                width: 100%;
-                max-width: 420px;
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-
-            .stats-col .stat-card { flex: 1 1 45%; }
+        @@media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
         }
 
         @@media (max-width: 768px) {
@@ -314,19 +330,23 @@
             }
 
             .main-content { padding: 20px 16px; }
-            .profile-card { padding: 22px 18px; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .list-card { padding: 18px 16px; }
 
-            .actions-row { flex-direction: column; width: 100%; }
+            .category-row { flex-wrap: wrap; }
+            .category-percentage, .category-status { flex: 1 1 auto; text-align: left; }
+
+            .actions-row { flex-direction: column; }
             .actions-row .btn { justify-content: center; width: 100%; }
         }
 
         @@media (max-width: 480px) {
-            .stats-col .stat-card { flex: 1 1 100%; }
+            .stats-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="topbar">Perfil</div>
+    <div class="topbar">Categoria</div>
 
     <div class="app-layout">
         <!-- SIDEBAR -->
@@ -346,9 +366,9 @@
 
             <ul class="nav-list">
                 <li><a href="#"><span class="nav-icon">🏠</span> Home</a></li>
-                <li><a href="@Url.Action("Index", "Profile")" class="active"><span class="nav-icon">👤</span> Usuario</a></li>
+                <li><a href="#"><span class="nav-icon">👤</span> Usuario</a></li>
                 <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestion</a></li>
-                <li><a href="#"><span class="nav-icon">🏷️</span> Categorias</a></li>
+                <li><a href="@Url.Action("Index", "Category")" class="active"><span class="nav-icon">🏷️</span> Categorias</a></li>
                 <li><a href="#"><span class="nav-icon">🏦</span> Ahorros</a></li>
                 <li><a href="#"><span class="nav-icon">➕</span> Ingresos</a></li>
                 <li><a href="#"><span class="nav-icon">➖</span> Egresos</a></li>
@@ -373,56 +393,59 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <div class="page-header">
-                <h1>Perfil</h1>
-                <p>Gestiona tu cuenta</p>
+                <h1>Categorias</h1>
+                <p>Gestiona la categoria.</p>
             </div>
 
-            <div class="content-row">
-                <!-- PROFILE DISPLAY -->
-                <div class="profile-col">
-                    <div class="avatar-wrapper">👤</div>
-
-                    <div class="profile-card">
-                        <div class="form-group">
-                            <label>Nombre:</label>
-                            <div class="display-value">@Model?.FullName</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Edad:</label>
-                            <div class="display-value">@Model?.Age</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Número Telefónico:</label>
-                            <div class="display-value">@Model?.PhoneNumber</div>
-                        </div>
-                        <div class="form-group">
-                            <label>Correo Electrónico:</label>
-                            <div class="display-value">@Model?.Email</div>
-                        </div>
-                    </div>
-
-                    <div class="actions-row">
-                        <a class="btn btn-editar" href="@Url.Action("Edit", "Profile")">✏️ Editar</a>
-                        <a class="btn btn-cerrar" href="@Url.Action("Logout", "User")">↪️ Cerrar Sesion</a>
-                        <a class="btn btn-eliminar" href="@Url.Action("Delete", "Profile")">⚠️ Eliminar</a>
-                    </div>
+            <section class="stats-row">
+                <div class="stat-card">
+                    <div class="label">Ingresos</div>
+                    <div class="value income">@Model.Stats.Ingresos.ToString("$#,##0") /Mes</div>
                 </div>
-
-                <!-- STAT CARDS -->
-                <div class="stats-col">
-                    <div class="stat-card">
-                        <div class="label">Plan</div>
-                        <div class="value">--</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Nombre</div>
-                        <div class="value">@Model?.FullName</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Fecha creación</div>
-                        <div class="value">--</div>
-                    </div>
+                <div class="stat-card">
+                    <div class="label">Egresos</div>
+                    <div class="value expense">@Model.Stats.Egresos.ToString("$#,##0") /Mes</div>
                 </div>
+                <div class="stat-card">
+                    <div class="label">Plan</div>
+                    <div class="value">@Model.Stats.PlanType</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label"># Egresos</div>
+                    <div class="value">@Model.Stats.CantidadEgresos</div>
+                </div>
+            </section>
+
+            <section class="list-card">
+                <div class="list-title">Categorias con su Egreso</div>
+
+                @if (Model.Categorias != null && Model.Categorias.Any())
+                {
+                    @foreach (var cat in Model.Categorias)
+                    {
+                        <div class="category-row">
+                            <div class="category-name">@cat.CategoryName</div>
+                            <div class="category-percentage">@cat.TotalEgresos.ToString("$#,##0")</div>
+                            <div class="category-status @(cat.CategoryStatus ? "active" : "inactive")">
+                                @(cat.CategoryStatus ? "Activa" : "Inactiva")
+                            </div>
+                            <div class="row-actions">
+                                <a class="icon-btn edit" href="@Url.Action("Edit", "Category", new { id = cat.CategoryId })" title="Actualizar">✎</a>
+                                <a class="icon-btn delete" href="@Url.Action("Delete", "Category", new { id = cat.CategoryId })" title="Eliminar">🗑</a>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-message">Aún no tienes categorías creadas.</div>
+                }
+            </section>
+
+            <div class="actions-row">
+                <a class="btn btn-crear" href="@Url.Action("Create", "Category")">➕ Crear</a>
+                <a class="btn btn-editar" href="@Url.Action("Index", "Category")">⚙️ Actualizar</a>
+                <a class="btn btn-eliminar" href="@Url.Action("Index", "Category")">🗑 Eliminar</a>
             </div>
         </main>
     </div>
