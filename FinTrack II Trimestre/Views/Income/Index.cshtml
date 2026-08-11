@@ -1,27 +1,48 @@
-﻿@model IEnumerable<FinTrack_II_Trimestre.Models.Income>
-
+﻿@page
+@model IEnumerable<FinTrack_II_Trimestre.Models.Income>
 @{
     ViewData["Title"] = "Ingresos";
     Layout = null;
-    var totalIngresos = Model?.Sum(i => i.IncomeAmount) ?? 0;
-}
 
+    var total = Model?.Sum(i => i.IncomeAmount) ?? 0;
+    var colors = new[] { "#e0453f", "#f5a623", "#8bc34a", "#2196f3", "#9c27b0" };
+
+    var stops = new List<string>();
+    var legend = new List<(string Nombre, decimal Pct, string Color)>();
+    decimal cumulative = 0;
+    int colorIndex = 0;
+
+    if (Model != null)
+    {
+        foreach (var income in Model)
+        {
+            var pct = total > 0 ? (income.IncomeAmount / total * 100) : 0;
+            var start = cumulative;
+            cumulative += pct;
+            var color = colors[colorIndex % colors.Length];
+            stops.Add($"{color} {start.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}% {cumulative.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)}%");
+            legend.Add((income.IncomeType, pct, color));
+            colorIndex++;
+        }
+    }
+
+    var gradientCss = stops.Any() ? string.Join(", ", stops) : "#1A3B55 0% 100%";
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>Ingresos - FinTrack</title>
-    <!-- Chart.js para el gráfico circular -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-dark: #0b0f1a;
-            --bg-panel: #101828;
+            --bg-dark: #011627;
+            --bg-panel: #031A2D;
             --bg-card: #1a2436;
             --bg-card-2: #16202f;
             --border-color: #253147;
-            --text-primary: #e8ecf3;
+            --text-primary: #FFFFFF;
             --text-secondary: #8b95a7;
             --text-muted: #6b7484;
             --accent-blue: #2b4a7a;
@@ -29,13 +50,12 @@
             --accent-red: #e0453f;
             --sidebar-active: #1e3a8a33;
             --sidebar-active-border: #3b5fd9;
-            --input-bg: linear-gradient(90deg, #e9ecf1, #c7ccd6);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
@@ -61,7 +81,6 @@
             display: flex;
             flex-direction: column;
             padding: 20px 16px;
-            border-right: 1px solid var(--border-color);
         }
 
         .brand {
@@ -143,6 +162,8 @@
             font-weight: 600;
         }
 
+        .nav-list li a .chevron { margin-left: auto; font-size: 0.75rem; }
+
         .nav-icon { width: 18px; text-align: center; }
 
         .sidebar-settings { margin-top: 10px; }
@@ -174,158 +195,155 @@
         /* ---------- MAIN CONTENT ---------- */
         .main-content {
             flex-grow: 1;
-            padding: 28px 32px;
+            padding: 28px 60px;
             overflow-x: hidden;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            justify-content: center;
+        }
+
+        .content-center {
+            width: 100%;
+            max-width: 900px;
         }
 
         .page-header h1 { font-size: 1.6rem; font-weight: 700; }
         .page-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
 
-        /* ---------- METRIC CARDS TOP BAR ---------- */
-        .metrics-row {
-            display: flex;
+        /* ---------- STAT CARDS ---------- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 14px;
-            flex-wrap: wrap;
+            margin: 36px 0 34px;
         }
 
-        .metric-card {
-            flex: 1;
-            min-width: 140px;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px 16px;
+        .stat-card {
+            background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%);
+            border-radius: 20px;
+            padding: 15px 10px;
             text-align: center;
         }
 
-        .metric-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
-        .metric-card .value { font-size: 1.15rem; font-weight: 700; }
+        .stat-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
+        .stat-card .value { font-size: 1.1rem; font-weight: 700; }
+        .stat-card .value.income { color: var(--accent-green); }
+        .stat-card .value.expense { color: var(--accent-red); }
 
-        .val-green { color: var(--accent-green); }
-        .val-red { color: var(--accent-red); }
-
-        /* ---------- GRID DE 2 COLUMNAS (LISTA + GRÁFICO) ---------- */
-        .dashboard-grid {
-            display: flex;
+        /* ---------- PANELS ---------- */
+        .panels-row {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
             gap: 20px;
-            flex-grow: 1;
         }
 
-        .panel-box {
-            flex: 1;
-            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
-            border: 1px solid var(--border-color);
+        .panel-card {
+            background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%);
             border-radius: 12px;
-            padding: 24px;
+            padding: 22px 26px;
             display: flex;
             flex-direction: column;
         }
 
         .panel-title {
-            text-align: center;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            font-size: 1rem;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .panel-divider {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 0 auto 20px auto;
-            width: 80%;
-        }
-
-        .alert-success {
-            background-color: rgba(62, 207, 110, 0.15);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 16px;
             text-align: center;
-        }
-
-        /* TABLA DE INGRESOS (ESTILO COMPACTO CON EDITAR) */
-        .income-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            flex-grow: 1;
-            overflow-y: auto;
+            padding-bottom: 12px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .income-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: background-color 0.15s ease;
+            gap: 10px;
+            padding: 11px 4px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .income-row:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
+        .income-row:last-of-type { border-bottom: none; }
 
-        .income-name {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
+        .income-name { flex: 1 1 auto; font-size: 0.92rem; }
+        .income-amount { flex: 0 0 60px; text-align: right; font-size: 0.92rem; }
 
-        .income-details {
+        .income-row-actions { display: flex; gap: 8px; flex: 0 0 auto; }
+
+        .icon-btn-sm {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
             display: flex;
             align-items: center;
-            gap: 16px;
-        }
-
-        .income-amount {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .btn-edit-icon {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.15s ease;
-        }
-
-        .btn-edit-icon:hover {
-            color: var(--text-primary);
-        }
-
-        .income-total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.25);
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-weight: 700;
-            font-size: 1rem;
-        }
-
-        /* GRÁFICO CIRCULAR */
-        .chart-container {
-            position: relative;
-            flex-grow: 1;
-            display: flex;
             justify-content: center;
-            align-items: center;
-            max-height: 280px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #fff;
+            background-color: var(--accent-blue);
         }
 
-        /* ---------- BOTONES DE ACCIÓN ---------- */
+        .icon-btn-sm.delete { background-color: var(--accent-red); }
+
+        .panel-row.total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            margin-top: auto;
+            padding-top: 14px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 40px 0;
+        }
+
+        /* ---------- PIE CHART ---------- */
+        .pie-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pie-chart {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            margin: 20px 0;
+        }
+
+        .legend {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .legend-pct { margin-left: auto; color: var(--text-primary); font-weight: 600; }
+
+        /* ---------- BOTTOM ACTIONS ---------- */
         .actions-row {
             display: flex;
-            gap: 16px;
-            margin-top: 5px;
+            gap: 14px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -334,43 +352,124 @@
             gap: 8px;
             border: none;
             border-radius: 24px;
-            padding: 10px 24px;
+            padding: 12px 22px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             cursor: pointer;
             color: #fff;
-            background-color: var(--accent-green);
-            text-decoration: none;
-            transition: filter 0.15s ease;
         }
 
         .btn:hover { filter: brightness(1.15); }
 
-        .btn-eliminar {
-            background-color: var(--accent-red);
-            color: #fff;
+        .btn-agregar {
+            background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%);
         }
 
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        /* ---------- MODALES ---------- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            width: 100%;
+            max-width: 420px;
+            background-color: #031A2D;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 26px 28px;
+        }
+
+        .modal-box h3 { font-size: 1.1rem; margin-bottom: 18px; text-align: center; }
+        .modal-box .form-group { margin-bottom: 16px; }
+
+        .modal-box label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .modal-box input[type="text"],
+        .modal-box input[type="number"],
+        .modal-box input[type="date"],
+        .modal-box select {
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 12px;
+            background-color: #c9ccd2;
+            font-size: 0.9rem;
+            color: #222;
+            outline: none;
+        }
+
+        .modal-box .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .modal-footer-row { display: flex; gap: 12px; justify-content: center; margin-top: 22px; }
+
+        .btn-cancelar {
+            background-color: transparent;
+            border: 1px solid var(--accent-red);
+            border-radius: 20px;
+            color: var(--accent-red);
+            padding: 10px 20px;
+        }
+
+        .btn-aceptar {
+            background-color: var(--accent-green);
+            border: 1px solid transparent;
+            border-radius: 20px;
+            padding: 10px 20px;
+        }
+
+        .delete-confirm-text { text-align: center; font-size: 0.9rem; color: var(--text-secondary); }
+
         /* ---------- RESPONSIVE ---------- */
-        @@media (max-width: 900px) {
-            .dashboard-grid {
-                flex-direction: column;
-            }
+        @@media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .panels-row { grid-template-columns: 1fr; }
         }
 
         @@media (max-width: 768px) {
             .app-layout { flex-direction: column; }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
+            .sidebar { width: 100%; border-bottom: 1px solid var(--border-color); }
             .main-content { padding: 20px 16px; }
-
-            .actions-row { flex-direction: column; width: 100%; }
+            .content-center { max-width: 100%; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .panel-card { padding: 18px 16px; }
+            .actions-row { flex-direction: column; }
             .actions-row .btn { justify-content: center; width: 100%; }
+        }
+
+        @@media (max-width: 480px) {
+            .stats-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -394,13 +493,18 @@
             <hr />
 
             <ul class="nav-list">
-                <li><a href="@Url.Action("Index", "Home")"><span class="nav-icon">🏠</span> Home</a></li>
-                <li><a href="@Url.Action("Index", "User")"><span class="nav-icon">👤</span> Usuario</a></li>
-                <li><a href="@Url.Action("Index", "BudgetPlan")"><span class="nav-icon">📋</span> Plan de Gestion</a></li>
+                <li><a href="#"><span class="nav-icon">🏠</span> Home</a></li>
+                <li><a href="#"><span class="nav-icon">👤</span> Usuario</a></li>
+                <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestion</a></li>
                 <li><a href="#"><span class="nav-icon">🏷️</span> Categorias</a></li>
                 <li><a href="#"><span class="nav-icon">🏦</span> Ahorros</a></li>
-                <li><a href="@Url.Action("Index", "Income")" class="active"><span class="nav-icon">➕</span> Ingresos</a></li>
-                <li><a href="@Url.Action("Index", "Expense")"><span class="nav-icon">➖</span> Egresos</a></li>
+                <li>
+                    <a href="@Url.Action("Index", "Income")" class="active">
+                        <span class="nav-icon">➕</span> Ingresos
+                        <span class="chevron">›</span>
+                    </a>
+                </li>
+                <li><a href="#"><span class="nav-icon">➖</span> Egresos</a></li>
             </ul>
 
             <hr />
@@ -421,146 +525,243 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <div class="page-header">
-                <h1>Ingresos</h1>
-                <p>Gestiona todos tus ingresos</p>
-            </div>
+            <div class="content-center">
+                <div class="page-header">
+                    <h1>Ingresos</h1>
+                    <p>Gestiona todos tus ingresos</p>
+                </div>
 
-            <!-- CARDS DE MÉTRICAS -->
-            <div class="metrics-row">
-                <div class="metric-card">
-                    <div class="label">Ingresos</div>
-                    <div class="value val-green">
-                        $@(((decimal)(ViewBag.TotalIngresosMes ?? 0)).ToString("N0"))/Mes
+                <!-- Tarjetas estaticas -->
+                <section class="stats-row">
+                    <div class="stat-card">
+                        <div class="label">Ingresos</div>
+                        <div class="value income">$2.400/Mes</div>
                     </div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Egresos</div>
-                    <div class="value val-red">$1.450/Mes</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Plan</div>
-                    <div class="value">30x30x60</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label"># Egresos</div>
-                    <div class="value">5</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label">Ahorro</div>
-                    <div class="value val-green">$12.500</div>
-                </div>
-            </div>
+                    <div class="stat-card">
+                        <div class="label">Ingresos Extra</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Egresos</div>
+                        <div class="value expense">$1.450/Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Plan</div>
+                        <div class="value">30x30x60</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Ahorro</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                </section>
 
-            <!-- DASHBOARD GRID: LISTA + GRÁFICO -->
-            <div class="dashboard-grid">
-                
-                <!-- COLUMNA IZQUIERDA: LISTA -->
-                <div class="panel-box">
-                    <div class="panel-title">Ingresos</div>
-                    <hr class="panel-divider" />
+                <section class="panels-row">
+                    <!-- LISTA DE INGRESOS -->
+                    <div class="panel-card">
+                        <div class="panel-title">Ingresos</div>
 
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert-success">
-                            @TempData["SuccessMessage"]
-                        </div>
-                    }
-
-                    <div class="income-list">
-                        @if (!Model.Any())
+                        @if (Model != null && Model.Any())
                         {
-                            <div style="text-align: center; color: var(--text-muted); padding: 20px;">
-                                No hay ingresos registrados.
+                            @foreach (var income in Model)
+                            {
+                                <div class="income-row">
+                                    <div class="income-name">@income.IncomeType</div>
+                                    <div class="income-amount">@income.IncomeAmount.ToString("0")</div>
+                                    <div class="income-row-actions">
+                                        <button type="button" class="icon-btn-sm edit"
+                                                onclick="openEditModal('@income.IncomeId','@income.IncomeType','@income.IncomeAmount.ToString(System.Globalization.CultureInfo.InvariantCulture)','@income.IncomeDate.ToString("yyyy-MM-dd")','@(income.IsFixed ? "true" : "false")','@income.Frequency','@income.CategoryId')"
+                                                title="Editar">✎</button>
+                                        <button type="button" class="icon-btn-sm delete"
+                                                onclick="openDeleteModal('@income.IncomeId','@income.IncomeType')"
+                                                title="Eliminar">🗑</button>
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="panel-row total">
+                                <span>Total</span>
+                                <span>@total.ToString("0")</span>
                             </div>
                         }
                         else
                         {
-                            @foreach (var item in Model)
-                            {
-                                <div class="income-row">
-                                    <span class="income-name">@item.IncomeType</span>
-                                    <div class="income-details">
-                                        <span class="income-amount">@item.IncomeAmount.ToString("N0")</span>
-                                        <a href="@Url.Action("Edit", "Income", new { id = item.IncomeId })" class="btn-edit-icon" title="Editar">✏️</a>
-                                    </div>
-                                </div>
-                            }
+                            <div class="empty-message">Aún no tienes ingresos registrados.</div>
                         }
                     </div>
 
-                    <div class="income-total-row">
-                        <span>Total</span>
-                        <span>@totalIngresos.ToString("N0")</span>
+                    <!-- GRAFICO DE DISTRIBUCION -->
+                    <div class="panel-card">
+                        <div class="panel-title">Ingresos</div>
+
+                        <div class="pie-wrapper">
+                            <div class="pie-chart" style="background: conic-gradient(@Html.Raw(gradientCss));"></div>
+
+                            <div class="legend">
+                                @foreach (var item in legend)
+                                {
+                                    <div class="legend-item">
+                                        <span class="legend-dot" style="background-color:@item.Color;"></span>
+                                        <span>@item.Nombre</span>
+                                        <span class="legend-pct">@item.Pct.ToString("0.#")%</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
+                </section>
+
+                <div class="actions-row">
+                    <button type="button" class="btn btn-agregar" onclick="openCreateModal(false)">
+                        <span class="btn-icon">+</span> Agregar Ingreso
+                    </button>
+                    <button type="button" class="btn btn-agregar" onclick="openCreateModal(true)">
+                        <span class="btn-icon">+</span> Agregar Extra
+                    </button>
                 </div>
-
-                <!-- COLUMNA DERECHA: GRÁFICO CIRCULAR -->
-                <div class="panel-box">
-                    <div class="panel-title">Ingresos</div>
-                    <hr class="panel-divider" />
-                    
-                    <div class="chart-container">
-                        <canvas id="incomePieChart"></canvas>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- BOTONES DE ACCIÓN -->
-            <div class="actions-row">
-                <a class="btn" href="@Url.Action("Create", "Income")">➕ Agregar Ingreso</a>
-                <a class="btn btn-eliminar" href="#">❌ Eliminar Ingreso</a>
             </div>
         </main>
     </div>
 
-    <!-- Script para renderizar el gráfico dinámicamente -->
+    <!-- ======= MODAL: AGREGAR ======= -->
+    <div class="modal-overlay" id="modalAgregar">
+        <div class="modal-box">
+            <h3 id="modalAgregarTitle">Nuevo Ingreso</h3>
+            <form method="post" asp-action="Create" asp-controller="Income">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label>Tipo de ingreso</label>
+                    <input type="text" name="IncomeType" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Monto</label>
+                    <input type="number" name="IncomeAmount" min="0.01" step="0.01" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" name="IncomeDate" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Categoria (Id)</label>
+                    <input type="number" name="CategoryId" required />
+                </div>
+
+                <div class="form-group checkbox-row">
+                    <input type="checkbox" name="IsFixed" id="createIsFixed" value="true" />
+                    <label style="margin:0;">Es un ingreso fijo</label>
+                </div>
+
+                <div class="form-group">
+                    <label>Frecuencia (si es fijo)</label>
+                    <input type="text" name="Frequency" placeholder="Mensual, Quincenal, Semanal" />
+                </div>
+
+                <div class="modal-footer-row">
+                    <button type="button" class="btn btn-cancelar" onclick="closeModal('modalAgregar')">Cancelar</button>
+                    <button type="submit" class="btn btn-aceptar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======= MODAL: EDITAR ======= -->
+    <div class="modal-overlay" id="modalEditar">
+        <div class="modal-box">
+            <h3>Editar Ingreso</h3>
+            <form method="post" asp-action="Edit" asp-controller="Income">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="IncomeId" id="editIncomeId" />
+
+                <div class="form-group">
+                    <label>Tipo de ingreso</label>
+                    <input type="text" name="IncomeType" id="editIncomeType" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Monto</label>
+                    <input type="number" name="IncomeAmount" id="editIncomeAmount" min="0.01" step="0.01" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" name="IncomeDate" id="editIncomeDate" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Categoria (Id)</label>
+                    <input type="number" name="CategoryId" id="editCategoryId" required />
+                </div>
+
+                <div class="form-group checkbox-row">
+                    <input type="checkbox" name="IsFixed" id="editIsFixed" value="true" />
+                    <label style="margin:0;">Es un ingreso fijo</label>
+                </div>
+
+                <div class="form-group">
+                    <label>Frecuencia (si es fijo)</label>
+                    <input type="text" name="Frequency" id="editFrequency" placeholder="Mensual, Quincenal, Semanal" />
+                </div>
+
+                <div class="modal-footer-row">
+                    <button type="button" class="btn btn-cancelar" onclick="closeModal('modalEditar')">Cancelar</button>
+                    <button type="submit" class="btn btn-aceptar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ======= MODAL: ELIMINAR ======= -->
+    <div class="modal-overlay" id="modalEliminar">
+        <div class="modal-box">
+            <h3>¿Eliminar este ingreso?</h3>
+            <form method="post" asp-action="DeleteConfirm" asp-controller="Income">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="deleteIncomeId" />
+                <p class="delete-confirm-text" id="deleteIncomeName">Ingreso: —</p>
+
+                <div class="modal-footer-row">
+                    <button type="button" class="btn btn-cancelar" onclick="closeModal('modalEliminar')">Cancelar</button>
+                    <button type="submit" class="btn btn-aceptar">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const ctx = document.getElementById('incomePieChart').getContext('2d');
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-            // Extraer datos desde Razor Model
-            const labels = [
-                @Html.Raw(string.Join(",", Model.Select(m => $"'{m.IncomeType}'")))
-            ];
-            const data = [
-                @Html.Raw(string.Join(",", Model.Select(m => m.IncomeAmount)))
-            ];
+        function openCreateModal(esExtra) {
+            document.getElementById('modalAgregarTitle').textContent = esExtra ? 'Nuevo Ingreso Extra' : 'Nuevo Ingreso';
+            document.getElementById('createIsFixed').checked = false;
+            openModal('modalAgregar');
+        }
 
-            // Colores por defecto si no hay datos
-            const chartLabels = labels.length > 0 ? labels : ['Sin datos'];
-            const chartData = data.length > 0 ? data : [1];
-            const colors = ['#ff5964', '#ffbc42', '#8ac926', '#1982c4', '#6a4c93', '#f15bb5'];
+        function openEditModal(id, tipo, monto, fecha, esFijo, frecuencia, categoryId) {
+            document.getElementById('editIncomeId').value = id;
+            document.getElementById('editIncomeType').value = tipo;
+            document.getElementById('editIncomeAmount').value = monto;
+            document.getElementById('editIncomeDate').value = fecha;
+            document.getElementById('editIsFixed').checked = esFijo === 'true';
+            document.getElementById('editFrequency').value = frecuencia || '';
+            document.getElementById('editCategoryId').value = categoryId || '';
+            openModal('modalEditar');
+        }
 
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        data: chartData,
-                        backgroundColor: colors.slice(0, chartLabels.length),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false // Oculta la leyenda superior para coincidir con la UI
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (context) {
-                                    let label = context.label || '';
-                                    let value = context.raw || 0;
-                                    return `${label}: $${value}`;
-                                }
-                            }
-                        }
-                    }
-                }
+        function openDeleteModal(id, nombre) {
+            document.getElementById('deleteIncomeId').value = id;
+            document.getElementById('deleteIncomeName').textContent = 'Ingreso: ' + nombre;
+            openModal('modalEliminar');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function (e) {
+                    if (e.target === overlay) overlay.classList.remove('open');
+                });
             });
         });
     </script>

@@ -1,6 +1,6 @@
-﻿@model /*FinTrack_II_Trimestre.Models.Home   don´t know where to put this*/
+﻿@page
 @{
-    ViewData["Title"] = "Página Principal";
+    ViewData["Title"] = "Home";
     Layout = null;
 }
 <!DOCTYPE html>
@@ -8,21 +8,22 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Página Principal - FinTrack</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Home - FinTrack</title>
     <style>
         :root {
-            --bg-dark: #0b0f1a;
-            --bg-panel: #101828;
+            --bg-dark: #011627;
+            --bg-panel: #031A2D;
             --bg-card: #1a2436;
             --bg-card-2: #16202f;
             --border-color: #253147;
-            --text-primary: #e8ecf3;
+            --text-primary: #FFFFFF;
             --text-secondary: #8b95a7;
             --text-muted: #6b7484;
             --accent-blue: #2b4a7a;
             --accent-green: #3ecf6e;
             --accent-red: #e0453f;
-            --accent-yellow: #e8c547;
+            --accent-gold: #f5c542;
             --sidebar-active: #1e3a8a33;
             --sidebar-active-border: #3b5fd9;
         }
@@ -30,7 +31,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
@@ -56,7 +57,6 @@
             display: flex;
             flex-direction: column;
             padding: 20px 16px;
-            border-right: 1px solid var(--border-color);
         }
 
         .brand {
@@ -138,6 +138,8 @@
             font-weight: 600;
         }
 
+        .nav-list li a .chevron { margin-left: auto; font-size: 0.75rem; }
+
         .nav-icon { width: 18px; text-align: center; }
 
         .sidebar-settings { margin-top: 10px; }
@@ -150,7 +152,6 @@
             border-radius: 10px;
             padding: 10px 12px;
             margin-top: 16px;
-            text-decoration: none;
         }
 
         .user-avatar {
@@ -170,8 +171,20 @@
         /* ---------- MAIN CONTENT ---------- */
         .main-content {
             flex-grow: 1;
-            padding: 28px 32px;
+            padding: 5rem 6rem;
             overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .content-center {
+            width: 100%;
+            max-width: 600rem;
+        }
+
+        .content-center1 {
+            width: 100%;
+            max-width: 400rem;
         }
 
         .page-header h1 { font-size: 1.6rem; font-weight: 700; }
@@ -179,129 +192,107 @@
 
         /* ---------- STAT CARDS ---------- */
         .stats-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
             gap: 14px;
-            margin-top: 26px;
-            flex-wrap: wrap;
+            margin: 36px 0 34px;
         }
 
         .stat-card {
-            flex: 1 1 160px;
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 16px;
+            background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%);
+            border-radius: 20px;
+            padding: 15px 10px;
             text-align: center;
         }
 
-        .stat-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 8px; }
-        .stat-card .value { font-size: 1.2rem; font-weight: 700; }
-        .stat-card .value.green { color: var(--accent-green); }
-        .stat-card .value.red { color: var(--accent-red); }
+        .stat-card .label { color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 6px; }
+        .stat-card .value { font-size: 1.6rem; font-weight: 700; }
+        .stat-card .value.income { color: var(--accent-green); }
+        .stat-card .value.expense { color: var(--accent-red); }
 
-        /* ---------- CONTENT GRID ---------- */
-        .content-grid {
-            display: flex;
-            gap: 24px;
-            margin-top: 24px;
-            flex-wrap: wrap;
+        /* ---------- PANELS ---------- */
+        .panels-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        .panel {
-            flex: 1 1 400px;
-            background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-card-2) 100%);
-            border: 1px solid var(--border-color);
+        .panel-card {
+            background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%);
             border-radius: 12px;
-            padding: 20px;
+            padding: 22px 26px;
+            display: flex;
+            flex-direction: column;
         }
 
         .panel-title {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
             margin-bottom: 6px;
-        }
-
-        .data-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 10px;
-            font-size: 0.9rem;
-            border-radius: 6px;
-        }
-
-        .data-row:nth-child(odd) { background-color: var(--bg-card); }
-        .data-row:nth-child(even) { background-color: var(--bg-card-2); }
-
-        .data-row.indent { padding-left: 24px; }
-        .data-row.indent2 { padding-left: 36px; }
-
-        .data-row.total {
-            font-weight: 700;
-            margin-top: 24px;
-            background-color: var(--bg-card-2);
-        }
-
-        .sub-title {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin: 20px 0 6px;
-            padding-bottom: 6px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .value-yellow { color: var(--accent-yellow); }
-
-        /* ---------- SHORTCUTS ---------- */
-        .shortcuts { text-align: center; margin-top: 30px; }
-
-        .shortcuts .title {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .shortcuts-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
+        .panel-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            border: none;
-            border-radius: 24px;
-            padding: 10px 22px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            color: #fff;
-            background-color: var(--accent-blue);
-            text-decoration: none;
+            justify-content: space-between;
+            padding: 12px 4px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.92rem;
         }
 
-        .btn:hover { filter: brightness(1.15); }
+        .panel-row:last-of-type { border-bottom: none; }
+
+        .panel-row.total {
+            font-weight: 700;
+            margin-top: 6px;
+            border-top: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .panel-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin: 18px 0 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .panel-row-foot {
+            background: linear-gradient(135deg, #224d6e 0%, #020508 100%);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 10px;
+        }
+
+        .panel-box{            
+            background: linear-gradient(135deg, #224d6e 0%, #020508 100%);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 10px;
+        }
+
+        .value-green { color: var(--accent-green); font-weight: 700; }
+        .value-gold { color: var(--accent-gold); font-weight: 700; }
 
         /* ---------- RESPONSIVE ---------- */
-        @@media (max-width: 900px) {
-            .content-grid { flex-direction: column; }
+        @@media (max-width: 1024px) {
+            .stats-row { grid-template-columns: repeat(3, 1fr); }
+            .panels-row { grid-template-columns: 1fr; }
         }
 
         @@media (max-width: 768px) {
             .app-layout { flex-direction: column; }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
+            .sidebar { width: 100%; border-bottom: 1px solid var(--border-color); }
             .main-content { padding: 20px 16px; }
+            .content-center { max-width: 100%; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .panel-card { padding: 18px 16px; }
+        }
+
+        @@media (max-width: 480px) {
+            .stats-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -325,11 +316,15 @@
             <hr />
 
             <ul class="nav-list">
-                <li><a href="@Url.Action("Index", "Home")" class="active"><span class="nav-icon">🏠</span> Home</a></li>
-                <li><a href="@Url.Action("Index", "Profile")"><span class="nav-icon">👤</span> Usuario</a></li>
-                <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestion</a></li>
+                <li>
+                    <a href="@Url.Action("Index", "Home")" class="active">
+                        <span class="nav-icon">🏠</span> Home <i class="bi bi-house-door"></i>
+                        <span class="chevron">›</span>
+                    </a>
+                </li>
+                <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestion</a></li> <i class="bi bi-person-fill"></i>
                 <li><a href="#"><span class="nav-icon">🏷️</span> Categorias</a></li>
-                <li><a href="#"><span class="nav-icon">🏦</span> Ahorros</a></li>
+                <li><a href="#"><span class="nav-icon">🏦</span> Ahorros</a></li>   
                 <li><a href="#"><span class="nav-icon">➕</span> Ingresos</a></li>
                 <li><a href="#"><span class="nav-icon">➖</span> Egresos</a></li>
             </ul>
@@ -340,83 +335,93 @@
                 <li><a href="#"><span class="nav-icon">⚙️</span> Settings</a></li>
             </ul>
 
-            <a href="@Url.Action("Index", "Profile")" class="user-card">
+            <div class="user-card">
                 <div class="user-avatar">👤</div>
                 <div class="user-info">
-                    <span>@Model.NombreUsuario</span>
-                    <small>@Model.Plan</small>
+                    <span>Usuario</span>
+                    <small>30x30x60</small>
                 </div>
                 <span class="chevron">›</span>
-            </a>
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <div class="page-header">
-                <h1>Bienvenido, @Model.NombreUsuario</h1>
-                <p>Mide tus estadísticas todo en un solo lugar.</p>
-            </div>
-
-            <!-- STAT CARDS -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="label">Ingresos</div>
-                    <div class="value green">@Model.Ingresos.ToString("C0")/Mes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Egresos</div>
-                    <div class="value red">@Model.Egresos.ToString("C0")/Mes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Plan</div>
-                    <div class="value">@Model.Plan</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label"># Egresos</div>
-                    <div class="value">@Model.NumeroEgresos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Ahorro</div>
-                    <div class="value green">@Model.MontoAhorro.ToString("C0")</div>
-                </div>
-            </div>
-
-            <!-- CONTENT GRID -->
-            <div class="content-grid">
-
-                <!-- Presupuestos -->
-                <div class="panel">
-                    <div class="panel-title">Presupuestos</div>
-                    @foreach (var item in Model.Presupuestos)
-                    {
-                        <div class="data-row"><span>@item.Nombre</span><span>@item.Monto</span></div>
-                    }
-                    <div class="data-row total"><span>Total</span><span>@Model.TotalPresupuesto</span></div>
+            <div class="content-center">
+                <div class="page-header">
+                    <h1>Bienvenido, Usuario</h1>
+                    <p>Mide tus estadísticas todo en un solo lugar.</p>
                 </div>
 
-                <!-- Distribucion -->
-                <div class="panel">
-                    <div class="panel-title">Distribución</div>
-                    <div class="data-row"><span>Gastos Fijos</span><span>@Model.PorcentajeGastosFijos%</span></div>
-                    <div class="data-row indent"><span>Ahorro</span><span>@Model.PorcentajeAhorro%</span></div>
-                    <div class="data-row indent2"><span>Ocio</span><span>@Model.PorcentajeOcio%</span></div>
-                    <div class="data-row"><span>Inversiones</span><span>@Model.PorcentajeInversiones%</span></div>
-                    <div class="data-row"><span>Ultima Modificacion</span><span>@Model.UltimaModificacion.ToString("dd-MM-yyyy")</span></div>
+                <!-- Tarjetas estaticas -->
+                <section class="stats-row">
+                    <div class="stat-card">
+                        <div class="label">Ingresos</div>
+                        <div class="value income">$2.400/Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Ingresos Extra</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Egresos</div>
+                        <div class="value expense">$1.450/Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Plan</div>
+                        <div class="value">30x30x60</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Ahorro</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                </section>
 
-                    <div class="sub-title">Ahorro</div>
-                    <div class="data-row"><span>Monto Actual:</span><span class="value-yellow">@Model.MontoAhorro.ToString("C0")</span></div>
-                    <div class="data-row"><span>Meta de Ahorro:</span><span class="value-yellow">@Model.MetaAhorro.ToString("C0")</span></div>
-                </div>
+                <section class="content-center1">
+                <section class="panels-row">
+                    <!-- PRESUPUESTOS -->
+                    <div class="panel-card">
+                        <div class="panel-title">Presupuestos</div>
 
-            </div>
+                        <div class="panel-row"><span>Agua</span><span>400</span></div>
+                        <div class="panel-row"><span>Luz</span><span>100</span></div>
+                        <div class="panel-row"><span>Comida</span><span>400</span></div>
+                        <div class="panel-row"><span>Viaje</span><span>300</span></div>
+                        <div class="panel-row"><span>Escuela</span><span>100</span></div>
 
-            <!-- SHORTCUTS -->
-            <div class="shortcuts">
-                <div class="title">Shortcuts</div>
-                <div class="shortcuts-buttons">
-                    <a class="btn" href="@Url.Action("Edit", "Ingresos")">✏️ Editar Ingresos</a>
-                    <a class="btn" href="@Url.Action("Edit", "Egresos")">✏️ Editar Egresos</a>
-                </div>
+                        <div class="panel-box">
+                        <div class="panel-row total">
+                            <span>Total</span>
+                            <span>1300</span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- DISTRIBUCION + AHORRO -->
+                    <div class="panel-card">
+                        <div class="panel-title">Distribución</div>
+
+                        <div class="panel-row"><span>Gastos Fijos</span><span>50%</span></div>
+                        <div class="panel-row"><span>Ahorro</span><span>20%</span></div>
+                        <div class="panel-row"><span>Ocio</span><span>10%</span></div>
+                        <div class="panel-row"><span>Inversiones</span><span>20%</span></div>
+                        <div class="panel-row"><span>Ultima Modificacion</span><span>04-11-2026</span></div>
+
+                        <div class="panel-subtitle">Ahorro</div>
+
+                        <div class="panel-row-foot">
+                        <div class="panel-row">
+                            <span>Monto Actual:</span>
+                            <span class="value-green">$12.500</span>
+                        </div>
+                        <div class="panel-row">
+                            <span>Meta de Ahorro:</span>
+                            <span class="value-gold">$32.000</span>
+                        </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
             </div>
         </main>
     </div>
