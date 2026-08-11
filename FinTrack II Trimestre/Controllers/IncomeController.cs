@@ -15,10 +15,8 @@ namespace FinTrack_II_Trimestre.Controllers
             _db = db;
         }
 
-        // Método auxiliar: obtener UserId de sesión
         private int? GetSessionUserId() => HttpContext.Session.GetInt32("UserId");
 
-        // Redirige a login si no hay sesión activa
         private IActionResult? CheckSession()
         {
             if (GetSessionUserId() == null)
@@ -26,7 +24,7 @@ namespace FinTrack_II_Trimestre.Controllers
             return null;
         }
 
-        // GET: Income — lista ingresos del usuario en sesión
+        // GET: Income
         public IActionResult Index()
         {
             var redirect = CheckSession();
@@ -39,26 +37,21 @@ namespace FinTrack_II_Trimestre.Controllers
                 .OrderByDescending(i => i.IncomeDate)
                 .ToList();
 
-            // RF-03: Calcular total de ingresos del mes actual para el dashboard
             var mesActual = DateTime.Now;
-            var totalIngresosMes = incomes
+            ViewBag.TotalIngresosMes = incomes
                 .Where(i => i.IncomeDate.Month == mesActual.Month && i.IncomeDate.Year == mesActual.Year)
                 .Sum(i => i.IncomeAmount);
 
-            ViewBag.TotalIngresosMes = totalIngresosMes;
+            // Cargar categorías activas para los dropdowns de los modales
+            ViewBag.Categories = _db.Categories
+                .Where(c => c.CategoryStatus)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CategoryId.ToString(),
+                    Text = c.CategoryName
+                }).ToList();
 
             return View(incomes);
-        }
-
-        // GET: Income/Create
-        public IActionResult Create()
-        {
-            var redirect = CheckSession();
-            if (redirect != null) return redirect;
-
-            ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus), "CategoryId", "CategoryName");
-            ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" });
-            return View();
         }
 
         // POST: Income/Create
@@ -71,58 +64,32 @@ namespace FinTrack_II_Trimestre.Controllers
 
             int userId = GetSessionUserId()!.Value;
 
-            // RN-02: Validar existencia de la categoría
-            var categoryExists = _db.Categories.Any(c => c.CategoryId == income.CategoryId);
-            if (!categoryExists)
+            // Validaciones de Reglas de Negocio
+            if (!_db.Categories.Any(c => c.CategoryId == income.CategoryId))
                 ModelState.AddModelError("CategoryId", "La categoría seleccionada no existe.");
 
-            // RF-02: Validar que la fecha no sea posterior al día de hoy
             if (income.IncomeDate > DateTime.Now)
                 ModelState.AddModelError("IncomeDate", "La fecha del ingreso no puede ser posterior al día de hoy.");
 
-            // RF-04: Si es fijo, la frecuencia es obligatoria
             if (income.IsFixed && string.IsNullOrEmpty(income.Frequency))
-                ModelState.AddModelError("Frequency", "Los ingresos fijos requieren una frecuencia (Mensual, Quincenal o Semanal).");
+                ModelState.AddModelError("Frequency", "Los ingresos fijos requieren una frecuencia.");
 
-            // RF-04: Si es variable, no debe tener frecuencia
             if (!income.IsFixed)
                 income.Frequency = null;
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
-                    "CategoryId", "CategoryName", income.CategoryId);
-                ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
-                return View(income);
+                // En lugar de retornar una vista inexistente, enviamos el error a Index
+                TempData["ErrorMessage"] = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return RedirectToAction(nameof(Index));
             }
 
-            // Asignar el usuario de la sesión
             income.UserId = userId;
-
             _db.Incomes.Add(income);
             _db.SaveChanges();
 
-            // RN-07: Recálculo de plan activo — pendiente de módulo BudgetPlan
             TempData["SuccessMessage"] = "Ingreso registrado exitosamente.";
             return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Income/Edit/5
-        public IActionResult Edit(int? id)
-        {
-            var redirect = CheckSession();
-            if (redirect != null) return redirect;
-
-            if (id == null || id == 0) return NotFound();
-
-            int userId = GetSessionUserId()!.Value;
-            var income = _db.Incomes.FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
-            if (income == null) return NotFound();
-
-            ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
-                "CategoryId", "CategoryName", income.CategoryId);
-            ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
-            return View(income);
         }
 
         // POST: Income/Edit
@@ -135,56 +102,36 @@ namespace FinTrack_II_Trimestre.Controllers
 
             int userId = GetSessionUserId()!.Value;
 
-            // RN-02: Validar existencia de la categoría
-            var categoryExists = _db.Categories.Any(c => c.CategoryId == income.CategoryId);
-            if (!categoryExists)
-                ModelState.AddModelError("CategoryId", "La categoría seleccionada no existe.");
+            // Verificar pertenencia del registro al usuario en sesión
+            var existingIncome = _db.Incomes.FirstOrDefault(i => i.IncomeId == income.IncomeId && i.UserId == userId);
+            if (existingIncome == null) return NotFound();
 
-            // RF-02: Validar fecha no futura
+            // Validaciones
             if (income.IncomeDate > DateTime.Now)
-                ModelState.AddModelError("IncomeDate", "La fecha del ingreso no puede ser posterior al día de hoy.");
+                ModelState.AddModelError("IncomeDate", "La fecha no puede ser posterior a hoy.");
 
-            // RF-04: Si es fijo, frecuencia obligatoria
             if (income.IsFixed && string.IsNullOrEmpty(income.Frequency))
-                ModelState.AddModelError("Frequency", "Los ingresos fijos requieren una frecuencia.");
-
-            if (!income.IsFixed)
-                income.Frequency = null;
+                ModelState.AddModelError("Frequency", "Seleccione una frecuencia para el ingreso fijo.");
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = new SelectList(_db.Categories.Where(c => c.CategoryStatus),
-                    "CategoryId", "CategoryName", income.CategoryId);
-                ViewBag.Frequencies = new SelectList(new[] { "Mensual", "Quincenal", "Semanal" }, income.Frequency);
-                return View(income);
+                TempData["ErrorMessage"] = string.Join(" ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+                return RedirectToAction(nameof(Index));
             }
 
-            // Mantener UserId de sesión para evitar suplantación
-            income.UserId = userId;
+            // Actualización de campos
+            existingIncome.IncomeType = income.IncomeType;
+            existingIncome.IncomeAmount = income.IncomeAmount;
+            existingIncome.IncomeDate = income.IncomeDate;
+            existingIncome.CategoryId = income.CategoryId;
+            existingIncome.IsFixed = income.IsFixed;
+            existingIncome.Frequency = income.IsFixed ? income.Frequency : null;
 
-            _db.Incomes.Update(income);
+            _db.Incomes.Update(existingIncome);
             _db.SaveChanges();
 
-            // RN-07: Recálculo automático de plan activo al modificar ingreso — pendiente de módulo BudgetPlan
             TempData["SuccessMessage"] = "Ingreso actualizado exitosamente.";
             return RedirectToAction(nameof(Index));
-        }
-
-        // GET: Income/Delete/5
-        public IActionResult Delete(int? id)
-        {
-            var redirect = CheckSession();
-            if (redirect != null) return redirect;
-
-            if (id == null || id == 0) return NotFound();
-
-            int userId = GetSessionUserId()!.Value;
-            var income = _db.Incomes
-                .Include(i => i.Category)
-                .FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
-
-            if (income == null) return NotFound();
-            return View(income);
         }
 
         // POST: Income/DeleteConfirm
@@ -198,13 +145,13 @@ namespace FinTrack_II_Trimestre.Controllers
             int userId = GetSessionUserId()!.Value;
             var income = _db.Incomes.FirstOrDefault(i => i.IncomeId == id && i.UserId == userId);
 
-            if (income == null) return NotFound();
+            if (income != null)
+            {
+                _db.Incomes.Remove(income);
+                _db.SaveChanges();
+                TempData["SuccessMessage"] = "Ingreso eliminado correctamente.";
+            }
 
-            _db.Incomes.Remove(income);
-            _db.SaveChanges();
-
-            // RN-07: Recálculo de plan — pendiente de módulo BudgetPlan
-            TempData["SuccessMessage"] = "Ingreso eliminado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
     }

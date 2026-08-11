@@ -83,51 +83,49 @@ namespace FinTrack_II_Trimestre.Controllers
 			return View(category);
 		}
 
-		// POST: Category/Edit
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public IActionResult Edit(Category category)
-		{
-			int userId = GetCurrentUserId();
-			var existing = _db.Categories.AsNoTracking().FirstOrDefault(c => c.CategoryId == category.CategoryId);
-			if (existing == null)
-			{
-				return NotFound();
-			}
+        // POST: Category/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Category category)
+        {
+            int userId = GetCurrentUserId();
 
-			if (existing.UserId != userId)
-			{
-				return Forbid();
-			}
+            // Consultamos la entidad sin AsNoTracking para actualizar sus propiedades directamente
+            var existing = _db.Categories.FirstOrDefault(c => c.CategoryId == category.CategoryId && c.UserId == userId);
+            if (existing == null)
+            {
+                return NotFound();
+            }
 
-			category.UserId = userId;
+            bool nombreExiste = _db.Categories.Any(c => c.UserId == userId && c.CategoryName == category.CategoryName && c.CategoryId != category.CategoryId);
+            if (nombreExiste)
+            {
+                ModelState.AddModelError("CategoryName", "Ya existe una categoría con ese nombre.");
+            }
 
-			bool nombreExiste = _db.Categories.Any(c => c.UserId == userId && c.CategoryName == category.CategoryName && c.CategoryId != category.CategoryId);
-			if (nombreExiste)
-			{
-				ModelState.AddModelError("CategoryName", "Ya existe una categoría con ese nombre.");
-			}
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    existing.CategoryName = category.CategoryName;
+                    existing.CategoryPercentage = category.CategoryPercentage;
+                    existing.CategoryStatus = category.CategoryStatus; // Recibe true si fue marcado, false si no.
 
-			if (ModelState.IsValid)
-			{
-				try
-				{
-					_db.Categories.Update(category);
-					_db.SaveChanges();
-					TempData["Success"] = "Categoría actualizada correctamente.";
-					return RedirectToAction(nameof(Index));
-				}
-				catch (Exception)
-				{
-					ModelState.AddModelError("", "Ocurrió un error al actualizar la categoría. Intenta de nuevo.");
-				}
-			}
+                    _db.SaveChanges();
+                    TempData["Success"] = "Categoría actualizada correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError("", "Ocurrió un error al actualizar la categoría. Intenta de nuevo.");
+                }
+            }
 
-			return View(category);
-		}
+            return View("Index", _db.Categories.Where(c => c.UserId == userId).ToList());
+        }
 
-		// GET: Category/Delete/5
-		public IActionResult Delete(int? id)
+        // GET: Category/Delete/5
+        public IActionResult Delete(int? id)
 		{
 			if (id == null || id == 0)
 			{

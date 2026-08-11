@@ -1,5 +1,4 @@
-﻿@page
-@model IEnumerable<FinTrack_II_Trimestre.Models.Category>
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.Category>
 @{
     ViewData["Title"] = "Categorias";
     Layout = null;
@@ -50,11 +49,10 @@
         }
 
         h1 {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 500;
-        font-size: 1rem;
-        line-height: normal;
-        letter-spacing: 0%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            line-height: normal;
         }
 
         /* ---------- SIDEBAR ---------- */
@@ -189,18 +187,29 @@
         .content-center {
             font-family: 'Montserrat', sans-serif;
             width: 100%;
-            max-width: 900rem;
+            max-width: 1200px;
         }
 
         .content-center1 {
             font-family: 'Montserrat', sans-serif;
             width: 100%;
-            padding: 30px 90px;
-            max-width: 500rem;
+            padding: 10px 0;
+            max-width: 100%;
         }
 
         .page-header h1 { font-size: 1.6rem; font-weight: 700; }
         .page-header p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+
+        /* ---------- ALERT MESSAGES ---------- */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .alert-success { background-color: #1c4228; color: var(--accent-green); border: 1px solid #27693d; }
+        .alert-danger { background-color: #421c1c; color: #ff8b85; border: 1px solid #692727; }
 
         /* ---------- STAT CARDS ---------- */
         .stats-row {
@@ -208,7 +217,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 14px;
-            margin: 36px 0 34px;
+            margin: 24px 0;
         }
 
         .stat-card {
@@ -220,17 +229,17 @@
         }
 
         .stat-card .label { color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 6px; }
-        .stat-card .value { font-size: 1.5  rem; font-weight: 700; }
+        .stat-card .value { font-size: 1.2rem; font-weight: 700; }
         .stat-card .value.income { color: var(--accent-green); }
         .stat-card .value.expense { color: var(--accent-red); }
 
         /* ---------- LIST CARD ---------- */
         .list-card {
-            background: linear-gradient(135deg,#1A3B55  0%, #0A2031 100%);
+            background: linear-gradient(135deg,#1A3B55 0%, #0A2031 100%);
             border-radius: 12px;
             padding: 26px 30px;
             min-height: 340px;
-            margin-bottom: 34px;
+            margin-bottom: 24px;
         }
 
         .list-title {
@@ -288,7 +297,7 @@
             padding: 60px 0;
         }
 
-        /* ---------- botones ---------- */
+        /* ---------- BOTONES ---------- */
         .actions-row {
             display: flex;
             gap: 14px;
@@ -315,8 +324,8 @@
         .btn-eliminar { 
             background: linear-gradient(135deg, #1A3B55 0%, #0A2031 100%); 
             border-radius: 20px;
-            padding: 15px 20px;
-            font-size: 1.2rem;
+            padding: 12px 24px;
+            font-size: 1rem;
         }
 
         .btn-icon {
@@ -326,7 +335,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -354,13 +363,12 @@
             width: 100%;
             max-width: 420px;
             background-color: #031A2D;
-            border: 1px solid #011627;
+            border: 1px solid #253147;
             border-radius: 12px;
             padding: 26px 28px;
         }
 
         .modal-box h3 {
-            font-family: 'Montserrat', sans-serif;
             font-size: 1.2rem;
             margin-bottom: 18px;
             text-align: center;
@@ -369,7 +377,6 @@
         .modal-box .form-group { margin-bottom: 16px; }
 
         .modal-box label {
-            font-family: 'Montserrat', sans-serif;
             display: block;
             font-size: 0.85rem;
             color: var(--text-secondary);
@@ -378,7 +385,6 @@
 
         .modal-box input[type="text"],
         .modal-box input[type="number"] {
-            font-family: 'Montserrat', sans-serif;
             width: 100%;
             border: none;
             border-radius: 6px;
@@ -390,7 +396,6 @@
         }
 
         .modal-box .checkbox-row {
-            font-family: 'Montserrat', sans-serif;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -399,7 +404,6 @@
         }
 
         .modal-footer-row {
-            font-family: 'Montserrat', sans-serif;
             display: flex;
             gap: 12px;
             justify-content: center;
@@ -407,40 +411,21 @@
         }
 
         .modal-footer-row .btn-cancelar {   
-        font-family: 'Montserrat', sans-serif;
-    background-color: transparent;
-    border: 1px solid var(--accent-red);
-    border-radius: 20px;
-    color: var(--accent-red);
-    padding: 10px 20px;
-}
-
-.modal-footer-row .btn-aceptarmod { 
-    font-family: 'Montserrat', sans-serif;
-    background: var(--accent-green);
-    border-radius: 20px;
-    color: var(--text-primary);
-    padding: 10px 20px;
-}
-
-        .modal-error {
-            font-family: 'Montserrat', sans-serif;
-            color: #ff8b85;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-            text-align: center;
+            background-color: transparent;
+            border: 1px solid var(--accent-red);
+            border-radius: 20px;
+            color: var(--accent-red);
+            padding: 10px 20px;
         }
 
-        .field-error {
-            font-family: 'Montserrat', sans-serif;
-            display: block;
-            color: #ff8b85;
-            font-size: 0.75rem;
-            margin-top: 4px;
+        .modal-footer-row .btn-aceptarmod { 
+            background: var(--accent-green);
+            border-radius: 20px;
+            color: var(--text-primary);
+            padding: 10px 20px;
         }
 
         .delete-confirm-text {
-            font-family: 'Montserrat', sans-serif;
             text-align: center;
             font-size: 0.9rem;
             color: var(--text-secondary);
@@ -453,21 +438,12 @@
 
         @@media (max-width: 768px) {
             .app-layout { flex-direction: column; }
-
-            .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-            }
-
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
             .main-content { padding: 20px 16px; }
-            .content-center { max-width: 100%; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
             .list-card { padding: 18px 16px; }
-
             .category-row { flex-wrap: wrap; }
             .category-percentage, .category-status { flex: 1 1 auto; text-align: left; }
-
             .actions-row { flex-direction: column; }
             .actions-row .btn { justify-content: center; width: 100%; }
         }
@@ -478,7 +454,7 @@
     </style>
 </head>
 <body>
-    <div class="topbar">Categoria</div>
+    <div class="topbar">Categoría</div>
 
     <div class="app-layout">
         <!-- SIDEBAR -->
@@ -499,10 +475,10 @@
             <ul class="nav-list">
                 <li><a href="#"><span class="nav-icon">🏠</span> Home</a></li>
                 <li><a href="#"><span class="nav-icon">👤</span> Usuario</a></li>
-                <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestion</a></li>
+                <li><a href="#"><span class="nav-icon">📋</span> Plan de Gestión</a></li>
                 <li>
                     <a href="@Url.Action("Index", "Category")" class="active">
-                        <span class="nav-icon">🏷️</span> Categorias
+                        <span class="nav-icon">🏷️</span> Categorías
                         <span class="chevron">›</span>
                     </a>
                 </li>
@@ -530,77 +506,87 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <div class="content-center">
-            <div class="page-header">
-                <h1>Categorias</h1>
-                <p>Gestiona la categoria.</p>
+                <div class="page-header">
+                    <h1>Categorías</h1>
+                    <p>Gestiona las categorías de tus egresos.</p>
+                </div>
+
+                <!-- Notificaciones de TempData -->
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <!-- Tarjetas estadísticas -->
+                <section class="stats-row">
+                    <div class="stat-card">
+                        <div class="label">Ingresos</div>
+                        <div class="value income">$2.400/Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Ingresos Extra</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Egresos</div>
+                        <div class="value expense">$1.450/Mes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Plan</div>
+                        <div class="value">30x30x60</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Ahorro</div>
+                        <div class="value income">$12.500</div>
+                    </div>
+                </section>
+
+                <section class="content-center1">
+                    <section class="list-card">
+                        <div class="list-title">Categorías con su Egreso</div>
+
+                        <div id="categoryList">
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var cat in Model)
+                                {
+                                    <div class="category-row"
+                                         data-id="@cat.CategoryId"
+                                         data-nombre="@cat.CategoryName"
+                                         data-porcentaje="@cat.CategoryPercentage"
+                                         data-status="@(cat.CategoryStatus ? "true" : "false")">
+                                        <div class="category-name">@cat.CategoryName</div>
+                                        <div class="category-percentage">@cat.CategoryPercentage%</div>
+                                        <div class="category-status @(cat.CategoryStatus ? "active" : "inactive")">
+                                            @(cat.CategoryStatus ? "Activa" : "Inactiva")
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="empty-message">Aún no tienes categorías creadas.</div>
+                            }
+                        </div>
+                    </section>
+
+                    <div class="actions-row">
+                        <button type="button" class="btn btn-agregar" onclick="openModal('modalAgregar')">
+                            <span class="btn-icon">+</span> Agregar
+                        </button>
+                        <button type="button" class="btn btn-editar" onclick="onEditarClick()">
+                            <span class="btn-icon">✎</span> Editar
+                        </button>
+                        <button type="button" class="btn btn-eliminar" onclick="onEliminarClick()">
+                            <span class="btn-icon">🗑</span> Eliminar
+                        </button>
+                    </div>
+                </section>
             </div>
-
-            <!-- Tarjetas estaticas -->
-            <section class="stats-row">
-                <div class="stat-card">
-                    <div class="label">Ingresos</div>
-                    <div class="value income">$2.400/Mes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Ingresos Extra</div>
-                    <div class="value income">$12.500</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Egresos</div>
-                    <div class="value expense">$1.450/Mes</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Plan</div>
-                    <div class="value">30x30x60</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">Ahorro</div>
-                    <div class="value income">$12.500</div>
-                </div>
-            </section>
-
-            <section class="content-center1">
-            <section class="list-card">
-                <div class="list-title">Categorias con su Egreso</div>
-
-                <div id="categoryList">
-                    @if (Model != null && Model.Any())
-                    {
-                        @foreach (var cat in Model)
-                        {
-                            <div class="category-row"
-                                 data-id="@cat.CategoryId"
-                                 data-nombre="@cat.CategoryName"
-                                 data-porcentaje="@cat.CategoryPercentage"
-                                 data-status="@(cat.CategoryStatus ? "true" : "false")">
-                                <div class="category-name">@cat.CategoryName</div>
-                                <div class="category-percentage">@cat.CategoryPercentage%</div>
-                                <div class="category-status @(cat.CategoryStatus ? "active" : "inactive")">
-                                    @(cat.CategoryStatus ? "Activa" : "Inactiva")
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="empty-message">Aún no tienes categorías creadas.</div>
-                    }
-                </div>
-            </section>
-
-            <div class="actions-row">
-                <button type="button" class="btn btn-agregar" onclick="openModal('modalAgregar')">
-                    <span class="btn-icon">+</span> Agregar
-                </button>
-                <button type="button" class="btn btn-editar" onclick="onEditarClick()">
-                    <span class="btn-icon">✎</span> Editar
-                </button>
-                <button type="button" class="btn btn-eliminar" onclick="onEliminarClick()">
-                    <span class="btn-icon">🗑</span> Eliminar
-                </button>
-            </div>
-            </div>
-        </section>
         </main>
     </div>
 
@@ -627,7 +613,7 @@
                 </div>
 
                 <div class="modal-footer-row">
-                    <button type="button" class="btn modal-footer-row btn-cancelar" onclick="closeModal('modalAgregar')">Cancelar</button>
+                    <button type="button" class="btn btn-cancelar" onclick="closeModal('modalAgregar')">Cancelar</button>
                     <button type="submit" class="btn btn-aceptarmod">Guardar</button>
                 </div>
             </form>
@@ -653,13 +639,14 @@
                 </div>
 
                 <div class="form-group checkbox-row">
+                    <!-- ASP.NET Binder maneja el checkbox desmarcado correctamente asignando el value true únicamente si está checked -->
                     <input type="checkbox" name="CategoryStatus" id="editCategoryStatus" value="true" />
                     <label style="margin:0;">Categoría activa</label>
                 </div>
 
                 <div class="modal-footer-row">
                     <button type="button" class="btn btn-cancelar" onclick="closeModal('modalEditar')">Cancelar</button>
-                    <button type="submit" class="btn btn-aceptar">Guardar</button>
+                    <button type="submit" class="btn btn-aceptarmod">Guardar</button>
                 </div>
             </form>
         </div>
@@ -676,7 +663,7 @@
 
                 <div class="modal-footer-row">
                     <button type="button" class="btn btn-cancelar" onclick="closeModal('modalEliminar')">Cancelar</button>
-                    <button type="submit" class="btn btn-aceptar">Eliminar</button>
+                    <button type="submit" class="btn btn-aceptarmod" style="background: var(--accent-red);">Eliminar</button>
                 </div>
             </form>
         </div>
@@ -718,7 +705,7 @@
 
             document.getElementById('editCategoryId').value = selectedRow.dataset.id;
             document.getElementById('editCategoryName').value = selectedRow.dataset.nombre;
-            document.getElementById('editCategoryPercentage').value = selectedRow.dataset.porcentaje;
+            document.getElementById('editCategoryPercentage').value = selectedRow.dataset.porcentaje.replace(',', '.');
             document.getElementById('editCategoryStatus').checked = selectedRow.dataset.status === 'true';
 
             openModal('modalEditar');
