@@ -1,0 +1,139 @@
+@model FinTrack_II_Trimestre.Models.ViewModels.ProfileIndexVM
+
+@{
+    ViewData["Title"] = "Dashboard de Usuario";
+}
+
+<div class="profile-dashboard-wrapper">
+    <div class="pd-header">
+        <div class="pd-greeting">
+            <h2>Hola, @Model.FullName</h2>
+            <p>Revisemos tus datos financieros de este mes.</p>
+        </div>
+        <div class="pd-actions">
+            <a asp-action="Edit" class="btn-pd edit"><i class="bi bi-pencil-fill"></i> Editar Perfil</a>
+            <a asp-controller="User" asp-action="Logout" class="btn-pd logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="pd-grid">
+        <!-- 1. Perfil Info -->
+        <div class="pd-card profile-info-card">
+            <div class="profile-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+            <h3>@Model.FullName</h3>
+            <div class="info-row mt-4">
+                <span class="info-label">Usuario</span>
+                <span class="info-value text-success">@Model.Username</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Correo</span>
+                <span class="info-value">@Model.Email</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Edad</span>
+                <span class="info-value">@(Model.Age > 0 ? Model.Age.ToString() : "--")</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "--" : Model.PhoneNumber)</span>
+            </div>
+            <div class="info-row mt-4">
+                 <a asp-action="Delete" class="btn-pd delete w-100 text-center justify-content-center"><i class="bi bi-trash-fill"></i> Eliminar Cuenta</a>
+            </div>
+        </div>
+
+        <!-- 2. Balance Summary -->
+        <div class="pd-card balance-card">
+            <div class="card-title">Resumen de Balance</div>
+            <div class="card-subtitle">Mes Actual</div>
+            <div class="balance-amount @(Model.NetBalance < 0 ? "text-danger" : "text-light")">
+                $@Model.NetBalance.ToString("N2")
+            </div>
+            
+            <div class="balance-details">
+                <div class="bd-item">
+                    <span class="dot income-dot"></span> <span class="bd-label">Ingresos</span>
+                    <div class="bd-value">$@Model.TotalIncomes.ToString("N2")</div>
+                </div>
+                <div class="bd-item">
+                    <span class="dot expense-dot"></span> <span class="bd-label">Egresos</span>
+                    <div class="bd-value">$@Model.TotalExpenses.ToString("N2")</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Plan Activo -->
+        <div class="pd-card plan-card d-flex flex-column justify-content-center align-items-center text-center">
+            <div class="card-title mb-3">Plan Activo</div>
+            <div class="plan-name">@Model.ActivePlan</div>
+            <p class="plan-desc mt-2">Distribución base de tus ingresos.</p>
+        </div>
+
+        <!-- 4. Transacciones Recientes -->
+        <div class="pd-card recent-tx-card">
+            <div class="card-title mb-3">Transacciones Recientes</div>
+            <div class="tx-list">
+                @if(Model.RecentTransactions.Any())
+                {
+                    foreach(var tx in Model.RecentTransactions)
+                    {
+                        <div class="tx-item">
+                            <div class="tx-icon @(tx.IsIncome ? "tx-inc" : "tx-exp")">
+                                <i class="bi @(tx.IsIncome ? "bi-arrow-down-left" : "bi-arrow-up-right")"></i>
+                            </div>
+                            <div class="tx-info">
+                                <div class="tx-desc">@tx.Description</div>
+                                <div class="tx-date">@tx.Date.ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="tx-cat">@tx.CategoryName</div>
+                            <div class="tx-amount @(tx.IsIncome ? "text-success" : "text-danger")">
+                                @(tx.IsIncome ? "+" : "-")$@tx.Amount.ToString("N2")
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted">No hay transacciones registradas.</div>
+                }
+            </div>
+        </div>
+
+        <!-- 5. Meta de Ahorro -->
+        <div class="pd-card savings-card">
+            <div class="card-title">Meta de Ahorro</div>
+            @if(Model.HasActiveSavingsGoal)
+            {
+                var progress = (Model.SavingsCurrentAmount / Model.SavingsTargetAmount) * 100;
+                if (progress > 100) progress = 100;
+
+                <div class="saving-progress-text mt-3">
+                    Progreso hacia <strong class="text-light">@Model.SavingsGoalName</strong>
+                </div>
+                <div class="saving-amounts mt-2">
+                    <h3>$@Model.SavingsCurrentAmount.ToString("N2")</h3>
+                    <span class="text-muted">de $@Model.SavingsTargetAmount.ToString("N2")</span>
+                </div>
+                
+                <div class="progress-bar-container mt-3">
+                    <div class="progress-bar-fill" style="width: @progress.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%;"></div>
+                </div>
+                <div class="progress-percentage text-end mt-1 text-muted" style="font-size: 0.85rem;">@progress.ToString("0.##")% completado</div>
+            }
+            else
+            {
+                <div class="saving-amounts mt-4 text-center">
+                    <h3 style="font-size: 2rem;">$@Model.SavingsCurrentAmount.ToString("N2")</h3>
+                    <span class="text-muted">Ahorro Total</span>
+                </div>
+                <p class="text-muted text-center mt-3">No tienes una meta de ahorro activa.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile-index.css" asp-append-version="true" />
+}

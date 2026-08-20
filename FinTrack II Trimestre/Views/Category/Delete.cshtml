@@ -1,0 +1,46 @@
+@model FinTrack_II_Trimestre.Models.Category
+
+@{
+    ViewData["Title"] = "Eliminar Categoría";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column" style="min-height: 70vh;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color: var(--ft-red);">¿Eliminar Categoría?</h2>
+    </div>
+
+    <div class="ft-main-box text-center" style="max-width: 500px; border: 1px solid rgba(248, 81, 73, 0.3);">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 4rem; color: var(--ft-red);"></i>
+        <p class="mt-3 text-white">Estás a punto de eliminar permanentemente esta categoría:</p>
+
+        <div class="text-start mb-4 p-3" style="background-color: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid #2a3a52;">
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Nombre:</span>
+                <span class="fw-bold text-white">@Model.CategoryName</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Porcentaje:</span>
+                <span class="fw-bold text-white">@Model.CategoryPercentage.ToString("0.##")%</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span style="color: var(--ft-text-muted);">Estado:</span>
+                <span class="fw-bold @(Model.CategoryStatus ? "text-success" : "text-secondary")">
+                    @(Model.CategoryStatus ? "Activa" : "Inactiva")
+                </span>
+            </div>
+        </div>
+
+        <p class="small mb-4" style="color: var(--ft-text-muted);">
+            Si esta categoría tiene gastos asociados, el sistema no permitirá su eliminación.
+        </p>
+
+        <form asp-action="DeleteConfirm" asp-route-id="@Model.CategoryId" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="d-flex gap-3 mt-4">
+                <a asp-action="Index" class="ft-btn ft-btn-outline w-50">Cancelar</a>
+                <button type="submit" class="ft-btn ft-btn-danger w-50">Sí, Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

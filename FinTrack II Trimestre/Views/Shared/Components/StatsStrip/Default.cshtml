@@ -1,0 +1,26 @@
+﻿@model dynamic
+
+<link rel="stylesheet" href="~/css/stats-strip.css" />
+
+<div class="stats-strip">
+    <div class="sc">
+        <div class="sc-label">Ingresos</div>
+        <div class="sc-value green">$@Model.TotalIngresos.ToString("N2")</div>
+    </div>
+    <div class="sc">
+        <div class="sc-label">Ingresos Extra</div>
+        <div class="sc-value green">$@Model.IngresosExtra.ToString("N2")</div>
+    </div>
+    <div class="sc">
+        <div class="sc-label">Egresos</div>
+        <div class="sc-value red">$@Model.TotalEgresos.ToString("N2")</div>
+    </div>
+    <div class="sc">
+        <div class="sc-label">Plan</div>
+        <div class="sc-value white">@Model.PlanActual</div>
+    </div>
+    <div class="sc">
+        <div class="sc-label">Ahorro</div>
+        <div class="sc-value green">$@Model.TotalAhorro.ToString("N2")</div>
+    </div>
+</div>

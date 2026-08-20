@@ -1,0 +1,111 @@
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.Expense>
+
+@{
+    ViewData["Title"] = "Egresos";
+}
+
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center border-0 rounded-pill" style="background-color: var(--ft-card-bg, #161b22); color: white;">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="ft-header mb-4">
+    <h2>Egresos</h2>
+    <p>Gestiona tus egresos.</p>
+</div>
+
+    @await Component.InvokeAsync("StatsStrip")
+
+<div class="ft-main-box mb-4">
+    <div class="ft-box-title">Lista de Egresos</div>
+    <div class="ft-box-divider"></div>
+
+    <div class="table-responsive w-100 mx-auto flex-grow-1">
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted mt-5"><i class="bi bi-inbox fs-1"></i><p>No hay egresos registrados.</p></div>
+        }
+        else
+        {
+            <table class="ft-table text-center">
+                <thead>
+                    <tr>
+                        <th class="text-start">Nombre del Gasto</th>
+                        <th>Categoría</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Vencimiento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="expense-row" onclick="selectExpense(@item.ExpenseId, this)">
+                            <td class="text-start fw-bold">@item.ExpenseName</td>
+                            <td>@(item.Category != null ? item.Category.CategoryName : "Sin Categoría")</td>
+                            <td style="color: #ff7b72; font-weight: 600;">$@item.ExpenseAmount.ToString("N2")</td>
+                            <td>@item.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (item.IsFixed)
+                                {
+                                    <span class="ft-badge-inactive">Fijo</span>
+                                }
+                                else
+                                {
+                                    <span class="ft-badge-active">Variable</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.IsFixed && item.DueDate.HasValue)
+                                {
+                                    @item.DueDate.Value.ToString("dd/MM/yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<div class="ft-action-bar">
+    <a asp-action="Create" class="ft-btn"><i class="bi bi-plus-circle-fill fs-5"></i> Agregar</a>
+    <button onclick="editSelected()" class="ft-btn"><i class="bi bi-pencil-fill"></i> Editar</button>
+    <button onclick="deleteSelected()" class="ft-btn"><i class="bi bi-trash3-fill"></i> Eliminar</button>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedId = null;
+
+        function selectExpense(id, rowElement) {
+            selectedId = id;
+            document.querySelectorAll('.expense-row').forEach(row => row.classList.remove('selected-row'));
+            rowElement.classList.add('selected-row');
+        }
+
+        function editSelected() {
+            if (!selectedId) { alert("Por favor, selecciona un egreso primero."); return; }
+            window.location.href = '/Expense/Edit/' + selectedId;
+        }
+
+        function deleteSelected() {
+            if (!selectedId) { alert("Por favor, selecciona un egreso primero."); return; }
+            window.location.href = '/Expense/Delete/' + selectedId;
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/expense-index.css" />
+}

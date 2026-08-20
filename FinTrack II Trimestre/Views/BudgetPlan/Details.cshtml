@@ -1,0 +1,77 @@
+﻿@model FinTrack_II_Trimestre.Models.BudgetPlan
+
+@{
+    ViewData["Title"] = "Detalles del Plan";
+    var planDetails = ViewBag.PlanDetails as List<FinTrack_II_Trimestre.Models.PlanDetail>;
+}
+
+
+
+<div class="ft-header mb-4">
+    <h2>Detalles de Plan</h2>
+    <p>Información específica del plan seleccionado.</p>
+</div>
+
+<div class="ft-main-box">
+    <div class="row">
+        <div class="col-md-4 ft-detail-item">
+            <div class="ft-detail-label">ID del Plan</div>
+            <div class="ft-detail-value">#@Model.PlanId</div>
+        </div>
+        <div class="col-md-4 ft-detail-item">
+            <div class="ft-detail-label">Tipo de Plan</div>
+            <div class="ft-detail-value">@Model.PlanType</div>
+        </div>
+        <div class="col-md-4 ft-detail-item">
+            <div class="ft-detail-label">Estado</div>
+            <div class="ft-detail-value">
+                @if (Model.Status)
+                {
+                    <span class="ft-badge-active">Activo</span>
+                }
+                else
+                {
+                    <span class="ft-badge-inactive">Inactivo</span>
+                }
+            </div>
+        </div>
+        <div class="col-md-4 ft-detail-item">
+            <div class="ft-detail-label">Fecha de Creación</div>
+            <div class="ft-detail-value">@Model.CreationDate.ToString("dd MMMM, yyyy")</div>
+        </div>
+    </div>
+
+    @if (Model.PlanType == "Personalizado" && planDetails != null && planDetails.Any())
+    {
+        <hr style="border-color: #2a3a52; margin: 30px 0;" />
+        <h5 style="color: #c9d1d9;">Categorías Asignadas</h5>
+
+        <div class="table-responsive">
+            <table class="ft-table">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th>Porcentaje Asignado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detail in planDetails)
+                    {
+                        <tr>
+                            <td>@detail.Category?.CategoryName</td>
+                            <td>@detail.Category?.CategoryPercentage.ToString("0.##")%</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div>
+        <a asp-action="Index" class="ft-btn-back"><i class="bi bi-arrow-left"></i> Volver al historial</a>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/budget-plan-details.css" />
+}

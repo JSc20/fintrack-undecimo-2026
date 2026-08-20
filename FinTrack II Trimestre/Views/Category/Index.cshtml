@@ -1,0 +1,109 @@
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.Category>
+
+@{
+    ViewData["Title"] = "Categorías";
+    var planActual = Context.Session.GetString("PlanActual") ?? "Sin plan";
+    var totalIngresos = ViewBag.TotalIngresosMes != null ? (decimal)ViewBag.TotalIngresosMes : 0m;
+    var totalEgresos = ViewBag.TotalEgresosMes != null ? (decimal)ViewBag.TotalEgresosMes : 0m;
+    var totalAhorro = ViewBag.TotalAhorro != null ? (decimal)ViewBag.TotalAhorro : 0m;
+    var ingresosExtra = ViewBag.IngresosExtra != null ? (decimal)ViewBag.IngresosExtra : 0m;
+}
+
+
+
+@if (TempData["Success"] != null || TempData["Error"] != null)
+{
+    <div class="alert @(TempData["Success"] != null ? "alert-success" : "alert-danger") text-center border-0 rounded-pill mb-3"
+         style="background:var(--ft-card-bg);color:white;">
+        @(TempData["Success"] ?? TempData["Error"])
+    </div>
+}
+
+<div class="pg-header">
+    <h2>Categorias</h2>
+    <p>Gestiona la categoria.</p>
+</div>
+
+<!-- STAT CARDS -->
+@await Component.InvokeAsync("StatsStrip")
+
+<!-- MAIN PANEL -->
+<div class="cat-panel">
+    <div class="cat-panel-header">Categorias con su Egreso</div>
+    <div class="cat-panel-divider"></div>
+
+    @if (!Model.Any())
+    {
+        <div class="cat-empty">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No hay categorías registradas.
+        </div>
+    }
+    else
+    {
+        <table class="cat-table">
+            <thead>
+                <tr>
+                    <th>Nombre de Categoría</th>
+                    <th>Estado</th>
+                    <th>Porcentaje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="cat-row" onclick="selectCategory(@item.CategoryId, this)">
+                        <td class="fw-bold">@item.CategoryName</td>
+                        <td>
+                            @if (item.CategoryStatus)
+                            {
+                                <span class="ft-badge-active">Activa</span>
+                            }
+                            else
+                            {
+                                <span class="ft-badge-inactive">Inactiva</span>
+                            }
+                        </td>
+                        <td>@item.CategoryPercentage.ToString("0.##")%</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="action-bar">
+    <a asp-action="Create" class="ft-btn-act">
+        <i class="bi bi-plus-circle-fill"></i> Agregar
+    </a>
+    <button onclick="editSelected()" class="ft-btn-act">
+        <i class="bi bi-pencil-fill"></i> Editar
+    </button>
+    <button onclick="deleteSelected()" class="ft-btn-act">
+        <i class="bi bi-trash3-fill"></i> Eliminar
+    </button>
+</div>
+
+@section Scripts {
+    <script>
+        let selectedId = null;
+        function selectCategory(id, el) {
+            selectedId = id;
+            document.querySelectorAll('.cat-row').forEach(r => r.classList.remove('selected-row'));
+            el.classList.add('selected-row');
+        }
+        function editSelected() {
+            if (!selectedId) { alert('Por favor, selecciona una categoría primero.'); return; }
+            window.location.href = '/Category/Edit/' + selectedId;
+        }
+        function deleteSelected() {
+            if (!selectedId) { alert('Por favor, selecciona una categoría primero.'); return; }
+            window.location.href = '/Category/Delete/' + selectedId;
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/category-index.css" />
+}

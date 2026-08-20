@@ -1,0 +1,126 @@
+﻿@model FinTrack_II_Trimestre.Models.BudgetPlan
+
+@{
+    ViewData["Title"] = "Plan de Gestión";
+}
+
+
+
+<div class="ft-header mb-5 text-center">
+    <h2>Plan de Gestión</h2>
+    <p class="text-muted">Elige un plan a elección</p>
+</div>
+
+<!-- Errores de validación -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" style="background-color: #1a293d; color: #ff7b72; border: 1px solid #ff7b72; border-radius: 10px;">
+        <div asp-validation-summary="All" class="mb-0"></div>
+    </div>
+}
+
+<form asp-action="Create" method="post" id="planForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="PlanType" id="SelectedPlanType" />
+    <input type="hidden" asp-for="CreationDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+
+    <div class="plan-container">
+        <!-- Tarjeta 50-30-20 -->
+        <div class="plan-card">
+            <div>
+                <div class="plan-card-title">50x30x20</div>
+                <div class="plan-card-divider"></div>
+                <div class="plan-card-text">
+                    pellentesque eu,<br />
+                    pretium quis, sem.<br />
+                    Donec pede justo,<br />
+                    fringilla vel, vulputa
+                </div>
+            </div>
+            <button type="button" class="btn-select" onclick="submitPlan('50-30-20')">
+                <span class="icon-plus">+</span> Seleccionar
+            </button>
+        </div>
+
+        <!-- Tarjeta 6x6 -->
+        <div class="plan-card">
+            <div>
+                <div class="plan-card-title">6x6</div>
+                <div class="plan-card-divider"></div>
+                <div class="plan-card-text">
+                    pellentesque eu,<br />
+                    pretium quis, sem.<br />
+                    Donec pede justo,<br />
+                    fringilla vel, vulputa
+                </div>
+            </div>
+            <button type="button" class="btn-select" onclick="submitPlan('6x6')">
+                <span class="icon-plus">+</span> Seleccionar
+            </button>
+        </div>
+
+        <!-- Tarjeta Personalizado -->
+        <div class="plan-card">
+            <div>
+                <div class="plan-card-title">Personalizado</div>
+                <div class="plan-card-divider"></div>
+                <div class="plan-card-text">
+                    pellentesque eu,<br />
+                    pretium quis, sem.<br />
+                    Donec pede justo,<br />
+                    fringilla vel, vulputa
+                </div>
+            </div>
+            <button type="button" class="btn-select" onclick="toggleCustomOptions()">
+                <span class="icon-plus">+</span> Seleccionar
+            </button>
+        </div>
+    </div>
+
+    <!-- Sección que se despliega SOLO si se elige Personalizado -->
+    <div class="custom-categories-box" id="customBox">
+        <h5 class="text-white mb-3">Configura tu plan personalizado (Suma debe ser 100% y contener Ahorro)</h5>
+        <div class="row">
+            @if (ViewBag.Categories != null)
+            {
+                foreach (var category in ViewBag.Categories as SelectList)
+                {
+                    <div class="col-md-3 mb-2">
+                        <div class="form-check text-white">
+                            <input class="form-check-input" type="checkbox" name="categoryIds" value="@category.Value" id="cat_@category.Value">
+                            <label class="form-check-label" for="cat_@category.Value">
+                                @category.Text
+                            </label>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <button type="button" class="btn btn-success mt-4 rounded-pill px-4" onclick="submitPlan('Personalizado')">
+            Confirmar Plan Personalizado
+        </button>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function submitPlan(type) {
+            document.getElementById('SelectedPlanType').value = type;
+            document.getElementById('planForm').submit();
+        }
+
+        function toggleCustomOptions() {
+            var box = document.getElementById('customBox');
+            if (box.style.display === "none" || box.style.display === "") {
+                box.style.display = "block";
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            } else {
+                box.style.display = "none";
+            }
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/budget-plan-create.css" />
+}

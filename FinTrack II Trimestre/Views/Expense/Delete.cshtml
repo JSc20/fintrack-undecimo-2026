@@ -1,0 +1,53 @@
+@model FinTrack_II_Trimestre.Models.Expense
+
+@{
+    ViewData["Title"] = "Eliminar Egreso";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column" style="min-height: 70vh;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold" style="color: var(--ft-red);">Eliminar Egreso</h2>
+        <p class="text-muted">¿Estás seguro de que deseas eliminar este registro?</p>
+    </div>
+
+    <div class="ft-main-box text-center" style="max-width: 500px; border: 1px solid rgba(248, 81, 73, 0.3);">
+        <i class="bi bi-trash3-fill" style="font-size: 4rem; color: var(--ft-red);"></i>
+        <h4 class="text-white mt-3 mb-4">@Model.ExpenseName</h4>
+
+        <div class="text-start mb-4 p-3" style="background-color: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid #2a3a52;">
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Monto:</span>
+                <span class="fw-bold" style="color: var(--ft-red);">$@Model.ExpenseAmount.ToString("N2")</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Categoría:</span>
+                <span class="text-white">@(Model.Category != null ? Model.Category.CategoryName : "N/A")</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Fecha:</span>
+                <span class="text-white">@Model.ExpenseDate.ToString("dd/MM/yyyy")</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span style="color: var(--ft-text-muted);">Tipo:</span>
+                <span class="text-white">@(Model.IsFixed ? "Gasto Fijo" : "Gasto Variable")</span>
+            </div>
+            @if (Model.IsFixed && Model.DueDate.HasValue)
+            {
+                <div class="d-flex justify-content-between">
+                    <span style="color: var(--ft-text-muted);">Vencimiento:</span>
+                    <span class="text-white">@Model.DueDate.Value.ToString("dd/MM/yyyy")</span>
+                </div>
+            }
+        </div>
+
+        <form asp-action="DeleteConfirm" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.ExpenseId" />
+
+            <div class="d-flex gap-3 mt-4">
+                <a asp-action="Index" class="ft-btn ft-btn-outline w-50">Cancelar</a>
+                <button type="submit" class="ft-btn ft-btn-danger w-50">Sí, Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>

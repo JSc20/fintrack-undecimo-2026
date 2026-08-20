@@ -1,0 +1,189 @@
+/* Estilos específicos del Dashboard (Home) */
+    .content-center {
+        width: 100%;
+        max-width: 950px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        margin-bottom: 30px;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: white;
+    }
+
+    .page-header p {
+        color: var(--ft-text-muted);
+        font-size: 0.95rem;
+        margin-top: 4px;
+        
+    }
+
+    /* ---------- STAT CARDS ---------- */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 12px;
+        padding: 15px 10px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .stat-card .label {
+        color: var(--ft-text-muted);
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+
+    .stat-card .value {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .stat-card .value.income {
+        color: var(--ft-green);
+    }
+
+    .stat-card .value.expense {
+        color: var(--ft-red);
+    }
+
+    /* ---------- PANELS ---------- */
+    .panels-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .panel-card {
+        background-color: var(--ft-card-bg);
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .panel-padding {
+        padding: 25px;
+    }
+
+    .panel-title {
+        font-size: 0.95rem;
+        color: var(--ft-text-muted);
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+    .panel-title::after {
+        content: "";
+        flex-grow: 1;
+        height: 1px;
+        background-color: rgba(0,0,0,0.1);
+        margin-left: 15px;
+    }
+
+    .panel-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 25px;
+        font-size: 0.9rem;
+        color: var(--ft-text-main);
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .panel-row > span {
+        min-width: 0;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .panel-row > span:last-child {
+        text-align: right;
+        flex-shrink: 0;
+        max-width: 55%;
+        padding-left: 8px;
+    }
+
+    .panel-list .panel-row:nth-child(odd) {
+        background-color: var(--ft-card-bg);
+    }
+
+    .panel-list .panel-row:nth-child(even) {
+        background-color: rgba(0,0,0,0.03);
+    }
+
+    .panel-footer {
+        background-color: rgba(0,0,0,0.05);
+        padding: 20px 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: auto;
+    }
+
+    .panel-footer .panel-row {
+        padding: 0;
+        background: transparent;
+    }
+
+    .panel-footer.total-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .value-gold {
+        color: #f5c542;
+    }
+
+    .empty-state {
+        color: var(--ft-text-muted);
+        font-size: 0.85rem;
+        text-align: center;
+        padding: 20px;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 1024px) {
+        .stats-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .panels-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+    }

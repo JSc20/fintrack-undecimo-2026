@@ -1,0 +1,105 @@
+.ft-header h2 { font-size: 2rem; font-weight: 500; color: #ffffff; margin-bottom: 5px; }
+    .ft-header p { color: #c8d0d9; font-size: 1rem; margin-bottom: 40px; }
+
+    .plan-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .plan-card {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 20px;
+        padding: 40px 30px;
+        width: 320px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 420px;
+    }
+
+    .plan-card-title {
+        color: #c9d1d9;
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+
+    .plan-card-divider {
+        height: 1px;
+        background-color: #3b4b5e;
+        width: 100%;
+        margin: 0 auto 40px auto;
+    }
+
+    .plan-card-text {
+        color: #6e7681;
+        font-size: 0.95rem;
+        font-style: italic;
+        margin-bottom: auto;
+        line-height: 1.5;
+    }
+
+    .btn-select {
+        background: linear-gradient(90deg, #d32f2f, #4a1c2f);
+        border: none;
+        border-radius: 25px;
+        color: white;
+        padding: 12px 20px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: 0.3s opacity;
+        width: 100%;
+        margin-top: 30px;
+    }
+    
+    .btn-select:hover { opacity: 0.9; }
+
+    .btn-select .icon-plus {
+        background-color: #3fb950;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    /* Estilos para las categorías personalizadas ocultas por defecto */
+    .custom-categories-box {
+        background-color: #1a293d;
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 40px;
+        display: none; /* Se activa con JS */
+    }
+
+/* Light Theme Additions */
+:root.light-theme .plan-card {
+    border-color: #cbd5e0;
+}
+:root.light-theme .plan-card-title { color: var(--ft-text-main); }
+:root.light-theme .plan-card-text { color: var(--ft-text-muted); }
+:root.light-theme .plan-card-divider { background-color: rgba(0,0,0,0.1); }
+:root.light-theme .custom-categories-box {
+    background-color: #f7fafc;
+    border: 1px solid #cbd5e0;
+}
+:root.light-theme .custom-categories-box h5,
+:root.light-theme .custom-categories-box .form-check-label {
+    color: var(--ft-text-main) !important;
+}
+
+@media (max-width: 480px) {
+    .plan-card { width: 100%; min-height: auto; }
+}

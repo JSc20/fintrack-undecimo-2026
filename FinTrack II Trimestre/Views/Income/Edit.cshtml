@@ -1,0 +1,91 @@
+@model FinTrack_II_Trimestre.Models.Income
+
+@{
+    ViewData["Title"] = "Editar Ingreso";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column" style="min-height: 70vh;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Editar Ingreso</h2>
+        <p class="text-muted">Modifica los detalles de este ingreso.</p>
+    </div>
+
+    <div class="ft-main-box" style="max-width: 600px;">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center small"></div>
+            <input type="hidden" asp-for="IncomeId" />
+            <input type="hidden" asp-for="UserId" />
+
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0 text-center">
+                    <label asp-for="IncomeType" class="form-label" style="color: var(--ft-text-muted);">Tipo de Ingreso</label>
+                    <input asp-for="IncomeType" class="form-control ft-input text-center" />
+                    <span asp-validation-for="IncomeType" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 text-center">
+                    <label asp-for="IncomeAmount" class="form-label" style="color: var(--ft-text-muted);">Monto</label>
+                    <input asp-for="IncomeAmount" class="form-control ft-input text-center" type="number" step="0.01" />
+                    <span asp-validation-for="IncomeAmount" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0 text-center">
+                    <label asp-for="CategoryId" class="form-label" style="color: var(--ft-text-muted);">Categoría</label>
+                    <select asp-for="CategoryId" class="form-select ft-input text-center" asp-items="ViewBag.Categories">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 text-center">
+                    <label asp-for="IncomeDate" class="form-label" style="color: var(--ft-text-muted);">Fecha del Ingreso</label>
+                    <input asp-for="IncomeDate" class="form-control ft-input text-center" type="date" />
+                    <span asp-validation-for="IncomeDate" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0 d-flex justify-content-center align-items-center gap-2">
+                    <input class="form-check-input mt-0" type="checkbox" asp-for="IsFixed" id="checkIsFixed" onchange="toggleFrequency()" style="width: 20px; height: 20px; background-color: rgba(0,0,0,0.2); border: 1px solid #2a3a52;">
+                    <label class="form-check-label mb-0" asp-for="IsFixed" style="color: white; font-weight: 500;">
+                        ¿Es un ingreso fijo?
+                    </label>
+                </div>
+                <div class="col-md-6 text-center">
+                    <label asp-for="Frequency" class="form-label" style="color: var(--ft-text-muted);">Frecuencia</label>
+                    <select asp-for="Frequency" class="form-select ft-input text-center" id="selectFrequency" asp-items="ViewBag.Frequencies">
+                        <option value="">-- Seleccione --</option>
+                    </select>
+                    <span asp-validation-for="Frequency" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <a asp-action="Index" class="ft-btn ft-btn-outline w-50">Cancelar</a>
+                <button type="submit" class="ft-btn ft-btn-success w-50">Actualizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function toggleFrequency() {
+            var isFixed = document.getElementById('checkIsFixed').checked;
+            var frequencySelect = document.getElementById('selectFrequency');
+            if (isFixed) {
+                frequencySelect.disabled = false;
+            } else {
+                frequencySelect.disabled = true;
+                frequencySelect.value = "";
+            }
+        }
+
+        window.onload = toggleFrequency;
+    </script>
+}

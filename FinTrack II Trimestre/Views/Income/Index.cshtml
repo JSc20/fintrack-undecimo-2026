@@ -1,0 +1,168 @@
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.Income>
+
+@{
+    ViewData["Title"] = "Ingresos";
+    var totalIngresos = ViewBag.TotalIngresosMes != null ? (decimal)ViewBag.TotalIngresosMes : 0m;
+    var ingresosExtra = Model.Where(i => !i.IsFixed).Sum(i => i.IncomeAmount);
+    var planActual = Context.Session.GetString("PlanActual") ?? "Sin plan";
+    var totalAhorro = ViewBag.TotalAhorro != null ? (decimal)ViewBag.TotalAhorro : 0m;
+    var totalEgresos = ViewBag.TotalEgresosMes != null ? (decimal)ViewBag.TotalEgresosMes : 0m;
+}
+
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center border-0 rounded-pill mb-3" style="background:var(--ft-card-bg);color:white;">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="pg-header">
+    <h2>Ingresos</h2>
+    <p>Gestiona todos tus ingresos</p>
+</div>
+
+<!-- STAT CARDS -->
+@await Component.InvokeAsync("StatsStrip")
+
+<!-- MAIN LAYOUT -->
+<div class="income-layout">
+    <!-- LEFT: Lista de ingresos -->
+    <div class="income-panel">
+        <div class="income-panel-header">Ingresos</div>
+        <div class="income-panel-divider"></div>
+
+        @if (!Model.Any())
+        {
+            <div class="income-empty">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                No hay ingresos registrados.
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="income-row-item income-row" data-id="@item.IncomeId" onclick="selectRow(@item.IncomeId, this)">
+                    <span class="income-row-name">@item.IncomeType</span>
+                    <span class="income-row-amount" style="color:var(--ft-green);">@item.IncomeAmount.ToString("N0")</span>
+                    <div class="income-row-icons">
+                        <a href="/Income/Edit/@item.IncomeId" title="Editar" onclick="event.stopPropagation()">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <button title="Eliminar" onclick="event.stopPropagation(); window.location.href='/Income/Delete/@item.IncomeId'">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="income-panel-footer">
+            <span>Total</span>
+            <span>@Model.Sum(i => i.IncomeAmount).ToString("N0")</span>
+        </div>
+    </div>
+
+    <!-- RIGHT: Gráfico de pie -->
+    <div class="chart-panel">
+        <div class="chart-panel-title">Ingresos</div>
+        <div class="chart-panel-divider"></div>
+        <div class="chart-wrapper">
+            @if (!Model.Any())
+            {
+                <p style="color:var(--ft-text-muted);font-size:0.85rem;">Sin datos para mostrar.</p>
+            }
+            else
+            {
+                <canvas id="incomeChart"></canvas>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="action-bar">
+    <a asp-action="Create" class="ft-btn-act">
+        <i class="bi bi-plus-circle-fill"></i> Agregar Ingreso
+    </a>
+    <a asp-action="Create" asp-route-extra="true" class="ft-btn-act">
+        <i class="bi bi-plus-circle-fill"></i> Agregar Extra
+    </a>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let selectedId = null;
+
+        function selectRow(id, el) {
+            selectedId = id;
+            document.querySelectorAll('.income-row').forEach(r => r.classList.remove('selected-row'));
+            el.classList.add('selected-row');
+        }
+
+        @if (Model.Any())
+        {
+            var labels = Model.Select(i => i.IncomeType).ToList();
+            var amounts = Model.Select(i => i.IncomeAmount).ToList();
+            <text>
+            const ctx = document.getElementById('incomeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(labels)),
+                    datasets: [{
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(amounts)),
+                        backgroundColor: ['#6366f1','#f85149','#3fb950','#f5c542','#58a6ff','#a371f7','#ff7b72'],
+                        borderWidth: 2,
+                        borderColor: '#0d1117'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                                    const pct = ((ctx.parsed / total)*100).toFixed(1);
+                                    return ` ${pct}%`;
+                                }
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    afterDraw(chart) {
+                        const { ctx, data, chartArea } = chart;
+                        const meta = chart.getDatasetMeta(0);
+                        const total = data.datasets[0].data.reduce((a,b)=>a+b,0);
+                        ctx.save();
+                        ctx.font = 'bold 11px Inter, sans-serif';
+                        ctx.fillStyle = '#fff';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        meta.data.forEach((arc, i) => {
+                            const pct = ((data.datasets[0].data[i]/total)*100).toFixed(1) + '%';
+                            const angle = (arc.startAngle + arc.endAngle) / 2;
+                            const r = (arc.innerRadius + arc.outerRadius) / 2;
+                            const x = arc.x + Math.cos(angle)*r*0.75;
+                            const y = arc.y + Math.sin(angle)*r*0.75;
+                            ctx.fillText(pct, x, y);
+                        });
+                        ctx.restore();
+                    }
+                }]
+            });
+            </text>
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/income-index.css" />
+}

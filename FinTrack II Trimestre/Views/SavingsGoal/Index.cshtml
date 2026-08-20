@@ -1,0 +1,131 @@
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.SavingsGoal>
+
+@{
+    ViewData["Title"] = "Ahorros";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success text-center border-0 rounded-pill" style="background-color: #161b22; color: #3fb950;">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger text-center border-0 rounded-pill" style="background-color: #161b22; color: #ff7b72;">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="ft-header mb-4">
+    <h2>Ahorros</h2>
+    <p>Gestiona tus ahorros.</p>
+</div>
+
+    @await Component.InvokeAsync("StatsStrip")
+
+<div class="ft-split-container">
+    <div class="ft-panel ft-left-panel">
+        <div class="ft-box-title text-start ps-2">Ahorros</div>
+        <div class="ft-box-divider"></div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted my-4">No hay metas de ahorro registradas.</div>
+        }
+        else
+        {
+            @foreach (var goal in Model)
+            {
+                <div class="goal-item">
+                    <div class="goal-row">
+                        <span class="goal-label">Nombre de Meta:</span>
+                        <div class="goal-value">
+                            @goal.GoalName
+                            <div class="goal-actions ms-3">
+                                <a asp-action="Edit" asp-route-id="@goal.GoalId"><i class="bi bi-pencil-fill"></i></a>
+                                <a asp-action="Delete" asp-route-id="@goal.GoalId" class="ms-2"><i class="bi bi-trash-fill"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="goal-row">
+                        <span class="goal-label">Meta de Ahorro:</span>
+                        <span class="goal-value">$@goal.TargetAmount.ToString("N0")</span>
+                    </div>
+                    <div class="ft-box-divider" style="background-color: rgba(42, 58, 82, 0.5); margin: 10px 0;"></div>
+                    <div class="goal-row">
+                        <span class="goal-label">Monto Actual:</span>
+                        <span class="goal-value text-white">$@goal.CurrentAmount.ToString("N0")</span>
+                    </div>
+                    <div class="goal-row">
+                        <span class="goal-label">Fecha de meta:</span>
+                        <span class="goal-value">@goal.TargetDate.ToString("dd-MM-yyyy")</span>
+                    </div>
+                </div>
+            }
+        }
+
+        <a asp-action="Create" class="ft-btn mt-4"><i class="bi bi-plus-circle-fill fs-5"></i> Crear nuevo ahorro</a>
+    </div>
+
+    <div class="ft-panel ft-right-panel">
+        <div class="ft-box-title">Ahorros</div>
+        <div class="ft-box-divider w-75 mx-auto"></div>
+
+        <div style="position: relative; height: 250px; width: 100%; display: flex; justify-content: center;">
+            @if (Model.Any(m => m.CurrentAmount > 0))
+            {
+                <canvas id="savingsChart"></canvas>
+            }
+            else
+            {
+                <p class="text-muted mt-5 text-center">Agrega montos a tus metas para ver el gráfico.</p>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Serializamos los datos del modelo para usarlos en JS
+        const goalsData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Select(m => new { m.GoalName, m.CurrentAmount })));
+
+        if (goalsData.length > 0 && goalsData.some(g => g.CurrentAmount > 0)) {
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+
+            const labels = goalsData.map(g => g.GoalName);
+            const data = goalsData.map(g => g.CurrentAmount);
+
+            // Colores vibrantes estilo tu mockup
+            const backgroundColors = ['#6a4c93', '#ff595e', '#ffca3a', '#8ac926', '#1982c4', '#f15bb5', '#00bbf9'];
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 1,
+                        borderColor: '#111827'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false } // Ocultamos la leyenda para que se parezca más al mockup
+                    }
+                }
+            });
+        }   
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/savings-goal-index.css" />
+}

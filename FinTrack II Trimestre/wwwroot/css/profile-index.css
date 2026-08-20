@@ -1,0 +1,266 @@
+/* ---- CONTENEDOR PRINCIPAL ---- */
+.profile-dashboard-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    color: #f8fafc;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* ---- HEADER ---- */
+.pd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.pd-greeting h2 { 
+    font-size: 1.8rem; 
+    font-weight: 600; 
+    margin-bottom: 4px; 
+    color: #ffffff;
+}
+.pd-greeting p { 
+    color: #94a3b8; 
+    font-size: 0.95rem; 
+    margin: 0; 
+}
+.pd-actions { 
+    display: flex; 
+    gap: 12px; 
+}
+.btn-pd {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #334155;
+}
+.btn-pd:hover { 
+    background: #334155; 
+    color: #ffffff; 
+}
+.btn-pd.delete { 
+    background: rgba(239, 68, 68, 0.1); 
+    color: #ef4444; 
+    border-color: rgba(239, 68, 68, 0.2); 
+}
+.btn-pd.delete:hover { 
+    background: #ef4444; 
+    color: #ffffff; 
+}
+
+/* ---- GRID LAYOUT ---- */
+.pd-grid {
+    display: grid;
+    grid-template-columns: 320px 1.2fr 1fr;
+    gap: 24px;
+    grid-template-areas: 
+        "info balance plan"
+        "info tx savings";
+}
+
+@media (max-width: 1100px) {
+    .pd-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "info balance"
+            "info plan"
+            "tx savings";
+    }
+}
+
+@media (max-width: 768px) {
+    .pd-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "info"
+            "balance"
+            "plan"
+            "tx"
+            "savings";
+    }
+    .pd-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+}
+
+.profile-info-card { grid-area: info; }
+.balance-card { grid-area: balance; }
+.plan-card { grid-area: plan; }
+.recent-tx-card { grid-area: tx; }
+.savings-card { grid-area: savings; }
+
+/* ---- TARJETAS (CARDS) ---- */
+.pd-card {
+    background: #111c2a; /* Fondo oscuro FinTrack */
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+}
+.card-title { 
+    font-size: 1.1rem; 
+    font-weight: 600; 
+    color: #f8fafc; 
+}
+.card-subtitle { 
+    font-size: 0.85rem; 
+    color: #94a3b8; 
+    margin-bottom: 16px; 
+}
+
+/* ---- PROFILE INFO CARD ---- */
+.profile-avatar {
+    width: 88px; 
+    height: 88px; 
+    border-radius: 50%;
+    background: #1e293b; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 3rem; 
+    margin: 0 auto 16px auto; 
+    color: #94a3b8;
+    border: 3px solid #334155;
+}
+.profile-info-card h3 { 
+    text-align: center; 
+    font-size: 1.3rem; 
+    margin-bottom: 24px; 
+    color: #ffffff;
+}
+.info-row { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    padding: 12px 0; 
+    border-bottom: 1px solid #1e293b; 
+}
+.info-row:last-of-type { border-bottom: none; }
+.info-label { color: #94a3b8; font-size: 0.9rem; }
+.info-value { font-weight: 600; color: #e2e8f0; }
+
+/* ---- BALANCE SUMMARY ---- */
+.balance-amount { 
+    font-size: 2.8rem; 
+    font-weight: 700; 
+    margin-bottom: 24px; 
+    letter-spacing: -1px;
+}
+.balance-details { 
+    display: flex; 
+    gap: 24px; 
+}
+.bd-item { 
+    flex: 1; 
+    background: rgba(30, 41, 59, 0.4);
+    padding: 12px;
+    border-radius: 12px;
+}
+.bd-label { font-size: 0.85rem; color: #94a3b8; }
+.bd-value { font-size: 1.2rem; font-weight: 600; margin-top: 6px; color: #f8fafc; }
+.dot { 
+    display: inline-block; 
+    width: 8px; 
+    height: 8px; 
+    border-radius: 50%; 
+    margin-right: 6px; 
+}
+.income-dot { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+.expense-dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+
+/* ---- PLAN CARD ---- */
+.plan-name { 
+    font-size: 2.2rem; 
+    font-weight: 800; 
+    color: #10b981; 
+    text-shadow: 0 0 15px rgba(16,185,129,0.2);
+}
+.plan-desc { 
+    color: #94a3b8; 
+    font-size: 0.9rem; 
+}
+
+/* ---- RECENT TRANSACTIONS ---- */
+.tx-list { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+}
+.tx-item { 
+    display: flex; 
+    align-items: center; 
+    gap: 16px; 
+    padding: 12px 16px; 
+    background: rgba(30, 41, 59, 0.4); 
+    border-radius: 12px; 
+    transition: background 0.2s;
+}
+.tx-item:hover { background: rgba(30, 41, 59, 0.8); }
+.tx-icon { 
+    width: 42px; 
+    height: 42px; 
+    border-radius: 50%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.2rem; 
+}
+.tx-inc { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.tx-exp { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.tx-info { flex: 1; overflow: hidden; }
+.tx-desc { 
+    font-weight: 600; 
+    font-size: 0.95rem; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+.tx-date { font-size: 0.8rem; color: #94a3b8; margin-top: 2px; }
+.tx-cat { font-size: 0.85rem; color: #94a3b8; width: 100px; text-align: right; }
+.tx-amount { font-weight: 700; font-size: 1rem; width: 90px; text-align: right; }
+
+/* ---- SAVINGS PROGRESS ---- */
+.saving-amounts h3 { 
+    font-size: 2rem; 
+    font-weight: 700; 
+    margin: 0; 
+    color: #f8fafc; 
+}
+.progress-bar-container { 
+    width: 100%; 
+    height: 10px; 
+    background: #1e293b; 
+    border-radius: 10px; 
+    overflow: hidden; 
+}
+.progress-bar-fill { 
+    height: 100%; 
+    background: linear-gradient(90deg, #0ea5e9, #38bdf8); /* Azul fresco tipo FinTrack */
+    border-radius: 10px; 
+    box-shadow: 0 0 10px rgba(14,165,233,0.5);
+}
+
+/* Light Theme Additions */
+:root.light-theme .profile-dashboard-wrapper { color: var(--ft-text-main); }
+:root.light-theme .pd-greeting h2 { color: var(--ft-text-main); }
+:root.light-theme .btn-pd { background: #edf2f7; color: var(--ft-text-main); border-color: #cbd5e0; }
+:root.light-theme .btn-pd:hover { background: #e2e8f0; }
+:root.light-theme .btn-pd.delete { background: rgba(197, 48, 48, 0.1); color: #c53030; border-color: rgba(197, 48, 48, 0.2); }
+:root.light-theme .btn-pd.delete:hover { background: #c53030; color: white; }
+:root.light-theme .pd-card { background: #ffffff; border-color: #e2e8f0; }
+:root.light-theme .card-title, :root.light-theme .profile-info-card h3, :root.light-theme .info-value, :root.light-theme .bd-value, :root.light-theme .saving-amounts h3, :root.light-theme .text-light, :root.light-theme .text-white { color: var(--ft-text-main) !important; }
+:root.light-theme .info-row { border-color: #e2e8f0; }
+:root.light-theme .bd-item, :root.light-theme .tx-item { background: #edf2f7; }
+:root.light-theme .tx-item:hover { background: #e2e8f0; }
+:root.light-theme .progress-bar-container { background: #e2e8f0; }
+:root.light-theme .profile-avatar { background: #edf2f7; border-color: #cbd5e0; }

@@ -1,0 +1,63 @@
+@model FinTrack_II_Trimestre.Models.SavingsGoal
+
+@{
+    ViewData["Title"] = "Crear Meta de Ahorro";
+}
+
+<div class="d-flex justify-content-center align-items-center flex-column" style="min-height: 70vh;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Crear Nuevo Ahorro</h2>
+        <p class="text-muted">Establece una nueva meta financiera.</p>
+    </div>
+
+    <div class="ft-main-box" style="max-width: 600px;">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 text-center small"></div>
+
+            <div class="mb-4 text-center">
+                <label asp-for="GoalName" class="form-label" style="color: var(--ft-text-muted);">Nombre de la Meta</label>
+                <input asp-for="GoalName" class="form-control ft-input text-center" placeholder="Ej: Viaje a Europa" />
+                <span asp-validation-for="GoalName" class="text-danger small mt-1 d-block"></span>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6 mb-3 mb-md-0 text-center">
+                    <label asp-for="TargetAmount" class="form-label" style="color: var(--ft-text-muted);">Meta de Ahorro ($)</label>
+                    <input asp-for="TargetAmount" class="form-control ft-input text-center" type="number" step="0.01" />
+                    <span asp-validation-for="TargetAmount" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 text-center">
+                    <label asp-for="CurrentAmount" class="form-label" style="color: var(--ft-text-muted);">Monto Actual ($)</label>
+                    <input asp-for="CurrentAmount" class="form-control ft-input text-center" type="number" step="0.01" value="0" />
+                    <span asp-validation-for="CurrentAmount" class="text-danger small mt-1 d-block"></span>
+                </div>
+            </div>
+
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0 text-center">
+                    <label asp-for="TargetDate" class="form-label" style="color: var(--ft-text-muted);">Fecha Límite</label>
+                    <input asp-for="TargetDate" class="form-control ft-input text-center" type="date" />
+                    <span asp-validation-for="TargetDate" class="text-danger small mt-1 d-block"></span>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center align-items-center gap-2">
+                    <input class="form-check-input mt-0" type="checkbox" asp-for="Status" checked style="width: 20px; height: 20px; background-color: rgba(0,0,0,0.2); border: 1px solid #2a3a52;">
+                    <label class="form-check-label mb-0" asp-for="Status" style="color: white; font-weight: 500;">
+                        Meta Activa
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <a asp-action="Index" class="ft-btn ft-btn-outline w-50">Cancelar</a>
+                <button type="submit" class="ft-btn ft-btn-success w-50">Guardar Meta</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

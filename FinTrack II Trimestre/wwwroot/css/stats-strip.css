@@ -1,0 +1,26 @@
+/* ---- STAT CARDS ---- */
+    .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .sc {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 12px 10px;
+        text-align: center;
+    }
+    .sc-label { font-size: 0.72rem; color: var(--ft-text-muted); margin-bottom: 4px; }
+    .sc-value { font-size: 1.05rem; font-weight: 700; }
+    .sc-value.green { color: var(--ft-green); }
+    .sc-value.red   { color: var(--ft-red); }
+    .sc-value.white { color: var(--ft-text-main); }
+
+    @media (max-width: 900px) {
+        .stats-strip { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 500px) {
+        .stats-strip { grid-template-columns: 1fr 1fr; }
+    }

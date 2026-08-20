@@ -1,0 +1,116 @@
+﻿@model IEnumerable<FinTrack_II_Trimestre.Models.BudgetPlan>
+
+@{
+    ViewData["Title"] = "Plan de Gestion";
+}
+
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center border-0 rounded-pill mb-4" style="background:var(--ft-card-bg);color:white;">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="pg-header">
+    <div>
+        <h2>Plan de Gestion</h2>
+        <p>Administra y revisa tu historial de planes de gestión</p>
+    </div>
+    
+    <div>
+        @if (!Model.Any())
+        {
+            <a asp-action="Create" class="btn-create-plan">
+                <i class="bi bi-plus-circle-fill"></i> Seleccionar Plan
+            </a>
+        }
+        else
+        {
+            <a asp-action="Create" class="btn-create-plan">
+                <i class="bi bi-arrow-repeat"></i> Cambiar Plan
+            </a>
+        }
+    </div>
+</div>
+
+<!-- STAT CARDS GLOBALES -->
+@await Component.InvokeAsync("StatsStrip")
+
+<div class="bp-panel mt-4">
+    <div class="bp-panel-header">Tus Planes de Gestión</div>
+    <div class="bp-panel-divider"></div>
+
+    @if (!Model.Any())
+    {
+        <div class="bp-empty">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No tienes ningún plan registrado. Utiliza el botón "Seleccionar Plan" para empezar.
+        </div>
+    }
+    else
+    {
+        <table class="bp-table">
+            <thead>
+                <tr>
+                    <th>Tipo de Plan</th>
+                    <th>Estado</th>
+                    <th>Fecha de Creación</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="bp-row" onclick="selectPlan(@item.PlanId, this)">
+                        <td class="fw-bold">@item.PlanType</td>
+                        <td>
+                            @if (item.Status)
+                            {
+                                <span class="ft-badge-active">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="ft-badge-inactive">Inactivo</span>
+                            }
+                        </td>
+                        <td>@item.CreationDate.ToString("dd/MM/yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (Model.Any())
+{
+    <div class="action-bar">
+       
+        <button onclick="deleteSelected()" class="ft-btn-act">
+            <i class="bi bi-trash3-fill"></i> Eliminar
+        </button>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        let selectedPlanId = null;
+        function selectPlan(id, el) {
+            selectedPlanId = id;
+            document.querySelectorAll('.bp-row').forEach(r => r.classList.remove('selected-row'));
+            el.classList.add('selected-row');
+        }
+        function editSelected() {
+            if (!selectedPlanId) { alert('Por favor, selecciona un plan primero del historial.'); return; }
+            window.location.href = '/BudgetPlan/Edit/' + selectedPlanId;
+        }
+        function deleteSelected() {
+            if (!selectedPlanId) { alert('Por favor, selecciona un plan primero del historial.'); return; }
+            window.location.href = '/BudgetPlan/Delete/' + selectedPlanId;
+        }
+    </script>
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/budget-plan-index.css" />
+}

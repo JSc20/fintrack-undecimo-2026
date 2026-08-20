@@ -1,0 +1,134 @@
+@model FinTrack_II_Trimestre.Models.ViewModels.HomeDashboardVM
+@{
+    ViewData["Title"] = "Página Principal";
+    // Layout = "_Layout" se aplica por defecto por _ViewStart, no hace falta declararlo.
+}
+
+
+
+<div class="content-center">
+    <div class="page-header">
+        <h1>Bienvenido, @(Context.Session.GetString("Username") ?? "Usuario")</h1>
+        <p>Mide tus estadísticas todo en un solo lugar.</p>
+    </div>
+
+    <!-- TARJETAS DE ALERTA (RF-05) -->
+    @if (Model.PorcentajePresupuestoUsado >= 100)
+    {
+        <div class="alert-card" style="background-color: rgba(255, 77, 77, 0.2); border-left: 4px solid #ff4d4d; color: white; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+            <strong>¡Atención!</strong> Has alcanzado o superado el 100% de tu presupuesto mensual. Considera ajustar tus gastos.
+        </div>
+    }
+    else if (Model.PorcentajePresupuestoUsado >= 80)
+    {
+        <div class="alert-card" style="background-color: rgba(255, 153, 0, 0.2); border-left: 4px solid #ff9900; color: white; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+            <strong>¡Cuidado!</strong> Has consumido el @Model.PorcentajePresupuestoUsado.ToString("N0")% de tu presupuesto de este mes.
+        </div>
+    }
+
+    <!-- RECORDATORIOS DE VENCIMIENTO (RF-07) -->
+    @if (Model.ProximosVencimientos.Any())
+    {
+        <div class="alert-card" style="background-color: rgba(0, 123, 255, 0.2); border-left: 4px solid #007bff; color: white; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+            <strong>Próximos Vencimientos:</strong> Tienes @Model.ProximosVencimientos.Count egreso(s) fijo(s) próximo(s) a vencer:
+            <ul style="margin-top: 5px; margin-bottom: 0;">
+                @foreach(var v in Model.ProximosVencimientos)
+                {
+                    <li>@v.ExpenseName - $@v.ExpenseAmount.ToString("N2") (Vence: @v.DueDate?.ToString("dd-MM-yyyy"))</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @await Component.InvokeAsync("StatsStrip")
+
+    <section class="panels-row">
+        <!-- Panel: Últimos Egresos -->
+        <div class="panel-card">
+            <div class="panel-padding" style="padding-bottom: 10px;">
+                <div class="panel-title">Últimos Egresos</div>
+            </div>
+
+            <div class="panel-list">
+                @if (Model.UltimosEgresos.Any())
+                {
+                    @foreach (var egreso in Model.UltimosEgresos)
+                    {
+                        <div class="panel-row">
+                            <span>@egreso.ExpenseName</span>
+                            <span class="value expense">$@egreso.ExpenseAmount.ToString("N2")</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">Sin egresos registrados</div>
+                }
+            </div>
+
+            <div class="panel-footer total-footer">
+                <span>Total del Mes</span>
+                <span class="value expense">$@Model.TotalEgresosMes.ToString("N2")</span>
+            </div>
+        </div>
+
+        <!-- Panel: Distribución y Ahorro -->
+        <div class="panel-card">
+            <div class="panel-padding" style="padding-bottom: 10px;">
+                <div class="panel-title">Distribución por Categoría</div>
+            </div>
+
+            <div class="panel-list">
+                @if (Model.CategoriasDistribucion.Any())
+                {
+                    @foreach (var cat in Model.CategoriasDistribucion)
+                    {
+                        <div class="panel-row" style="flex-wrap: wrap;">
+                            <span style="flex-basis: 60%;">@cat.CategoryName (@cat.CategoryPercentage.ToString("N0")%)</span>
+                            <span style="flex-basis: 40%; text-align: right;" class="@(cat.AvailableAmount < 0 ? "expense value" : "income value")">Disp: $@cat.AvailableAmount.ToString("N2")</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">Sin categorías activas</div>
+                }
+                @if (Model.UltimaModificacionPlan.HasValue)
+                {
+                    <div class="panel-row">
+                        <span>Última Modificación del Plan</span>
+                        <span style="color: white;">@Model.UltimaModificacionPlan.Value.ToString("dd-MM-yyyy")</span>
+                    </div>
+                }
+            </div>
+
+            <div class="panel-padding" style="padding-top: 20px; padding-bottom: 10px;">
+                <div class="panel-title">Ahorro</div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="panel-row">
+                    <span>Monto Actual:</span>
+                    <span class="value income">$@Model.MontoAhorroActual.ToString("N2")</span>
+                </div>
+                <div class="panel-row">
+                    <span>Meta de Ahorro:</span>
+                    <span class="value value-gold">
+                        @if (Model.MetaAhorro > 0)
+                        {
+                            <text>$@Model.MetaAhorro.ToString("N2")</text>
+                        }
+                        else
+                        {
+                            <text>Sin meta definida</text>
+                        }
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/home-index.css" />
+}

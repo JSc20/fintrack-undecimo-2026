@@ -1,0 +1,149 @@
+.ft-header h2 {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .ft-header p {
+        color: var(--ft-text-muted, #c8d0d9);
+        font-size: 0.95rem;
+    }
+
+    .ft-stats-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .ft-stat-card {
+        background-color: var(--ft-card-bg, #161b22);
+        border-radius: 15px;
+        padding: 12px 20px;
+        text-align: center;
+        flex: 1;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        min-width: 120px;
+    }
+
+    .ft-stat-title {
+        font-size: 0.75rem;
+        color: var(--ft-text-muted, #c8d0d9);
+        margin-bottom: 2px;
+    }
+
+    .ft-stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Layout de dos columnas */
+    .ft-split-container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .ft-panel {
+        background: var(--ft-box-gradient, linear-gradient(180deg, #1c273a 0%, #111827 100%));
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .ft-left-panel {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ft-right-panel {
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ft-box-title {
+        text-align: center;
+        color: var(--ft-text-muted, #c8d0d9);
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .ft-box-divider {
+        height: 1px;
+        background-color: #2a3a52;
+        width: 100%;
+        margin: 15px 0;
+    }
+
+    /* Estilos de la lista de metas */
+    .goal-item {
+        margin-bottom: 25px;
+    }
+
+    .goal-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .goal-label {
+        color: var(--ft-text-muted, #c9d1d9);
+    }
+
+    .goal-value {
+        font-weight: 600;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .goal-actions a {
+        color: #c8d0d9;
+        transition: 0.2s;
+        font-size: 1.1rem;
+    }
+
+        .goal-actions a:hover {
+            color: white;
+        }
+
+    .ft-btn {
+        background-color: var(--ft-card-bg, #161b22);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-decoration: none;
+        align-self: center;
+        margin-top: auto;
+    }
+
+        .ft-btn:hover {
+            background-color: #2a3a52;
+            color: white;
+        }
+
+/* Light theme additions */
+:root.light-theme .ft-box-divider { background-color: rgba(0,0,0,0.1) !important; }
+:root.light-theme .goal-value { color: var(--ft-text-main) !important; }
+:root.light-theme .goal-actions a { color: var(--ft-text-muted); }
+:root.light-theme .goal-actions a:hover { color: var(--ft-accent); }
+:root.light-theme .ft-btn { background-color: var(--ft-accent); }
+:root.light-theme .ft-btn:hover { filter: brightness(1.1); }

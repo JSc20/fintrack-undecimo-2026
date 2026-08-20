@@ -1,0 +1,153 @@
+﻿.pg-header { margin-bottom: 24px; }
+    .pg-header h2 { font-size: 1.8rem; font-weight: 600; margin-bottom: 3px; }
+    .pg-header p { color: var(--ft-text-muted); font-size: 0.9rem; }
+
+    /* ---- STAT CARDS ---- */
+    .stats-strip {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    .sc {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 14px;
+        padding: 12px 10px;
+        text-align: center;
+    }
+    .sc-label { font-size: 0.72rem; color: var(--ft-text-muted); margin-bottom: 4px; }
+    .sc-value { font-size: 1.05rem; font-weight: 700; }
+    .sc-value.green { color: var(--ft-green); }
+    .sc-value.red   { color: var(--ft-red); }
+
+    /* ---- TWO COLUMNS ---- */
+    .income-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* ---- LEFT PANEL ---- */
+    .income-panel {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .income-panel-header {
+        padding: 18px 24px 10px;
+        font-size: 0.85rem;
+        color: var(--ft-text-muted);
+        font-weight: 600;
+    }
+    .income-panel-divider {
+        height: 1px;
+        background: #1f2937;
+        margin: 0 24px 8px;
+    }
+    .income-row-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 13px 24px;
+        font-size: 0.9rem;
+        transition: background 0.15s;
+        cursor: pointer;
+    }
+    .income-row-item:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .income-row-item:hover { background: rgba(255,255,255,0.06); }
+    .income-row-item.selected-row { background: #2a4b73 !important; outline: 1px solid #4a7ab3; }
+    .income-row-name { font-weight: 500; flex: 1; }
+    .income-row-amount { font-weight: 600; margin-right: 14px; }
+    .income-row-icons { display: flex; gap: 10px; }
+    .income-row-icons a,
+    .income-row-icons button {
+        background: none; border: none; padding: 0;
+        color: var(--ft-text-muted); font-size: 0.95rem;
+        cursor: pointer; transition: color 0.15s; text-decoration: none;
+    }
+    .income-row-icons a:hover { color: #58a6ff; }
+    .income-row-icons button:hover { color: var(--ft-red); }
+    .income-panel-footer {
+        background: #0d131c;
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .income-empty {
+        text-align: center;
+        color: var(--ft-text-muted);
+        padding: 40px 20px;
+        font-size: 0.88rem;
+    }
+
+    /* ---- RIGHT PANEL (Chart) ---- */
+    .chart-panel {
+        background: var(--ft-box-gradient);
+        border: 1px solid #1f2937;
+        border-radius: 16px;
+        padding: 20px 24px;
+        min-height: 340px;
+        display: flex;
+        flex-direction: column;
+    }
+    .chart-panel-title {
+        font-size: 0.85rem;
+        color: var(--ft-text-muted);
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .chart-panel-divider {
+        height: 1px;
+        background: #1f2937;
+        margin-bottom: 20px;
+    }
+    .chart-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    canvas#incomeChart { max-height: 280px; }
+
+    /* ---- ACTIONS ---- */
+    .action-bar {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin-top: 22px;
+    }
+    .ft-btn-act {
+        background: var(--ft-card-bg);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+    }
+    .ft-btn-act:hover { background: #2a3a52; color: white; }
+
+    @media (max-width: 900px) {
+        .stats-strip { grid-template-columns: repeat(3,1fr); }
+        .income-layout { grid-template-columns: 1fr; }
+    }
+
+/* Light Theme Additions */
+:root.light-theme .income-row-item:nth-child(even) { background: rgba(0,0,0,0.03); }
+:root.light-theme .income-row-item:hover { background: rgba(0,0,0,0.06); }
+:root.light-theme .income-panel-footer { background: rgba(0,0,0,0.05); }
+:root.light-theme .income-panel-divider, :root.light-theme .chart-panel-divider { background: rgba(0,0,0,0.1); }
+:root.light-theme .ft-btn-act { background: var(--ft-accent); color: white; }
+:root.light-theme .ft-btn-act:hover { filter: brightness(1.1); }
